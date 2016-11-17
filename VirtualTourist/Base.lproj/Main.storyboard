@@ -40,6 +40,27 @@
                             <mapView clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="scaleToFill" mapType="standard" translatesAutoresizingMaskIntoConstraints="NO" id="16P-5t-Jrq">
                                 <rect key="frame" x="0.0" y="0.0" width="375" height="667"/>
                             </mapView>
+                            <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="BFB-K2-Urk">
+                                <rect key="frame" x="0.0" y="587" width="375" height="80"/>
+                                <subviews>
+                                    <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Tap Pins To Delete " textAlignment="center" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="gNw-Li-nHK">
+                                        <rect key="frame" x="107.5" y="25" width="160" height="30"/>
+                                        <constraints>
+                                            <constraint firstAttribute="height" constant="30" id="225-pb-xh7"/>
+                                            <constraint firstAttribute="width" constant="160" id="EhZ-6C-WBO"/>
+                                        </constraints>
+                                        <fontDescription key="fontDescription" type="system" pointSize="19"/>
+                                        <color key="textColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
+                                        <nil key="highlightedColor"/>
+                                    </label>
+                                </subviews>
+                                <color key="backgroundColor" red="1" green="0.074743433489999997" blue="0.0" alpha="1" colorSpace="calibratedRGB"/>
+                                <constraints>
+                                    <constraint firstAttribute="height" constant="80" id="0eg-N6-CjR"/>
+                                    <constraint firstItem="gNw-Li-nHK" firstAttribute="centerY" secondItem="BFB-K2-Urk" secondAttribute="centerY" id="Hhf-g7-Pna"/>
+                                    <constraint firstItem="gNw-Li-nHK" firstAttribute="centerX" secondItem="BFB-K2-Urk" secondAttribute="centerX" id="nQ9-fB-nqB"/>
+                                </constraints>
+                            </view>
                         </subviews>
                         <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
                         <constraints>
@@ -47,16 +68,27 @@
                             <constraint firstAttribute="trailing" secondItem="16P-5t-Jrq" secondAttribute="trailing" id="I6A-Jh-Ynw"/>
                             <constraint firstItem="16P-5t-Jrq" firstAttribute="top" secondItem="h6E-PP-tz9" secondAttribute="top" id="X0w-we-1uF"/>
                             <constraint firstItem="16P-5t-Jrq" firstAttribute="leading" secondItem="h6E-PP-tz9" secondAttribute="leading" id="YNJ-Vq-poT"/>
+                            <constraint firstItem="BFB-K2-Urk" firstAttribute="leading" secondItem="h6E-PP-tz9" secondAttribute="leading" id="eD7-Pn-F9s"/>
+                            <constraint firstItem="gq3-mw-9Q4" firstAttribute="top" secondItem="BFB-K2-Urk" secondAttribute="bottom" id="slN-DE-oyU"/>
+                            <constraint firstAttribute="trailing" secondItem="BFB-K2-Urk" secondAttribute="trailing" id="v6x-nm-fSK"/>
                         </constraints>
                     </view>
-                    <navigationItem key="navigationItem" id="rCD-FX-OxT"/>
+                    <navigationItem key="navigationItem" id="rCD-FX-OxT">
+                        <barButtonItem key="rightBarButtonItem" title="Item" id="IFs-nl-74r">
+                            <connections>
+                                <action selector="editAction:" destination="fHv-XS-6mv" id="tP6-gq-Jab"/>
+                            </connections>
+                        </barButtonItem>
+                    </navigationItem>
                     <connections>
+                        <outlet property="buttonItem" destination="IFs-nl-74r" id="Cbe-wh-CuH"/>
                         <outlet property="mapView" destination="16P-5t-Jrq" id="du4-FC-B5E"/>
+                        <outlet property="viewToDeletePins" destination="BFB-K2-Urk" id="93i-Sj-3ZU"/>
                     </connections>
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="Vsk-bm-wnJ" userLabel="First Responder" sceneMemberID="firstResponder"/>
             </objects>
-            <point key="canvasLocation" x="72.799999999999997" y="58.920539730134934"/>
+            <point key="canvasLocation" x="160.80000000000001" y="58.920539730134934"/>
         </scene>
     </scenes>
 </document>
