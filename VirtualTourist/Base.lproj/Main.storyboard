@@ -104,7 +104,7 @@
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <subviews>
                             <collectionView clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="scaleToFill" dataMode="prototypes" translatesAutoresizingMaskIntoConstraints="NO" id="kZK-wE-RqB">
-                                <rect key="frame" x="0.0" y="190" width="375" height="477"/>
+                                <rect key="frame" x="0.0" y="170" width="375" height="497"/>
                                 <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
                                 <collectionViewFlowLayout key="collectionViewLayout" minimumLineSpacing="10" minimumInteritemSpacing="10" id="rgF-GD-d3g">
                                     <size key="itemSize" width="96" height="94"/>
@@ -137,7 +137,7 @@
                                 </cells>
                             </collectionView>
                             <mapView clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="scaleToFill" mapType="standard" translatesAutoresizingMaskIntoConstraints="NO" id="dtS-fX-I5U">
-                                <rect key="frame" x="0.0" y="40" width="375" height="150"/>
+                                <rect key="frame" x="0.0" y="20" width="375" height="150"/>
                                 <constraints>
                                     <constraint firstAttribute="height" constant="150" id="PoY-3m-Tb2"/>
                                 </constraints>
@@ -151,7 +151,7 @@
                             <constraint firstAttribute="trailing" secondItem="dtS-fX-I5U" secondAttribute="trailing" id="WRc-9o-P6y"/>
                             <constraint firstItem="dtS-fX-I5U" firstAttribute="leading" secondItem="npy-MO-Brf" secondAttribute="leading" id="XnP-ch-n0b"/>
                             <constraint firstItem="kZK-wE-RqB" firstAttribute="top" secondItem="dtS-fX-I5U" secondAttribute="bottom" id="dHc-Cn-XL2"/>
-                            <constraint firstItem="dtS-fX-I5U" firstAttribute="top" secondItem="tfb-or-pPm" secondAttribute="bottom" constant="20" id="ymw-Bz-vab"/>
+                            <constraint firstItem="dtS-fX-I5U" firstAttribute="top" secondItem="tfb-or-pPm" secondAttribute="bottom" id="ymw-Bz-vab"/>
                         </constraints>
                     </view>
                     <connections>
