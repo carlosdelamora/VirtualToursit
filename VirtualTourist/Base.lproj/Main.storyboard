@@ -41,7 +41,7 @@
                                 <rect key="frame" x="0.0" y="0.0" width="375" height="667"/>
                             </mapView>
                             <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="BFB-K2-Urk">
-                                <rect key="frame" x="0.0" y="587" width="375" height="80"/>
+                                <rect key="frame" x="0.0" y="667" width="375" height="80"/>
                                 <subviews>
                                     <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Tap Pins To Delete " textAlignment="center" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="gNw-Li-nHK">
                                         <rect key="frame" x="107.5" y="25" width="160" height="30"/>
@@ -69,7 +69,7 @@
                             <constraint firstItem="16P-5t-Jrq" firstAttribute="top" secondItem="h6E-PP-tz9" secondAttribute="top" id="X0w-we-1uF"/>
                             <constraint firstItem="16P-5t-Jrq" firstAttribute="leading" secondItem="h6E-PP-tz9" secondAttribute="leading" id="YNJ-Vq-poT"/>
                             <constraint firstItem="BFB-K2-Urk" firstAttribute="leading" secondItem="h6E-PP-tz9" secondAttribute="leading" id="eD7-Pn-F9s"/>
-                            <constraint firstItem="gq3-mw-9Q4" firstAttribute="top" secondItem="BFB-K2-Urk" secondAttribute="bottom" id="slN-DE-oyU"/>
+                            <constraint firstItem="gq3-mw-9Q4" firstAttribute="top" secondItem="BFB-K2-Urk" secondAttribute="bottom" constant="-80" id="slN-DE-oyU"/>
                             <constraint firstAttribute="trailing" secondItem="BFB-K2-Urk" secondAttribute="trailing" id="v6x-nm-fSK"/>
                         </constraints>
                     </view>
