@@ -7,7 +7,8 @@
 //
 
 import Foundation
-
+import UIKit
+import MapKit
 
 class FlickFinderClient:NSObject{
     
@@ -37,7 +38,7 @@ class FlickFinderClient:NSObject{
         return components.url!
     }
     
-    func flickGetMethod(_ methodURL: URL, _ completionHandeler: @escaping ([String: AnyObject], Error?)-> Void){
+    func flickGetMethod(_ methodURL: URL, _ view: MKAnnotationView, _ completionHandeler: @escaping ([String: AnyObject], MKAnnotationView, Error?)-> Void){
         
         let session = URLSession.shared
         let request = URLRequest(url: methodURL)
@@ -55,7 +56,7 @@ class FlickFinderClient:NSObject{
             if (error != nil){
                 performUIUpdatesOnMain {
                     //TODO: check for the error
-                    completionHandeler([String: AnyObject](),error)
+                    completionHandeler([String: AnyObject](),view,error)
                 }
                 
                 displayError("\(error)")
@@ -69,7 +70,7 @@ class FlickFinderClient:NSObject{
             
             //if there is no error we use this completion handeler on GCD
             performUIUpdatesOnMain {
-                completionHandeler(jsonData,nil)
+                completionHandeler(jsonData,view, nil)
             }
             
         }
@@ -103,8 +104,8 @@ class FlickFinderClient:NSObject{
         do{jsonData = try JSONSerialization.jsonObject(with: data, options:.allowFragments)}catch{
             print("the json data could not be obtained")
         }
-        print(jsonData)
-        print("here is the json Data")
+        //print(jsonData)
+        //print("here is the json Data")
         return jsonData as? [String:AnyObject]
     }
 

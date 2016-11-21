@@ -135,7 +135,6 @@ extension MapViweController: MKMapViewDelegate{
     
     //we use this delegate function to respond to taps on the pins
     func mapView(_ mapView: MKMapView, didSelect view: MKAnnotationView) {
-        print("edit mode is \(editMode)")
         if editMode{
             mapView.removeAnnotation(view.annotation!)
         }else{
@@ -151,8 +150,8 @@ extension MapViweController: MKMapViewDelegate{
             ] 
 
            let method = client.flickURLFromParameters(methodParameters)
-            client.flickGetMethod(method){jsonData, error in
-                self.closureForGetMethod(jsonData, error as NSError?)
+            client.flickGetMethod(method,view){jsonData,view, error in
+                self.closureForGetMethod(jsonData, view, error as NSError?)
             }
         }
             
@@ -171,7 +170,7 @@ extension MapViweController: MKMapViewDelegate{
         }
     }
 
-    func closureForGetMethod(_ jsonData:[String: AnyObject], _ error: NSError?){
+    func closureForGetMethod(_ jsonData:[String: AnyObject], _ view:MKAnnotationView, _ error: NSError?){
         
         guard (error == nil) else{
             print("There was an error in closure ForGetMethod \(error)")
@@ -180,12 +179,13 @@ extension MapViweController: MKMapViewDelegate{
         
         let controller = storyboard?.instantiateViewController(withIdentifier: "CollectionViewController") as! CollectionViewController
         self.navigationController?.pushViewController(controller, animated: true)
+        //set the button with the right title and font
         let backButton = UIBarButtonItem()
         backButton.title = "OK"
         backButton.setTitleTextAttributes([NSFontAttributeName: UIFont(name: "Helvetica", size: 20)!], for: UIControlState.normal)
         navigationItem.backBarButtonItem = backButton
-
-        print("\(jsonData)")
+        //set the mapView in the controller to the right region
+        controller.annotation = view.annotation
     }
     
     
@@ -196,7 +196,6 @@ extension MapViweController: MKMapViewDelegate{
         regionDictionary["latitudeDelta"] = mapView.region.span.latitudeDelta
         regionDictionary["longitudeDelta"] = mapView.region.span.longitudeDelta
         UserDefaults.standard.set(regionDictionary, forKey: "mapRegion")
-        print("\(regionDictionary)")
     }
     
 }

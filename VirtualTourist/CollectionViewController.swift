@@ -13,11 +13,21 @@ import UIKit
 
 class CollectionViewController: UIViewController{
     
+    var annotation: MKAnnotation?
     @IBOutlet weak var mapView: MKMapView!
     
+    override func viewDidLoad() {
+        mapView.region.center = annotation!.coordinate
+        var nearSpan = MKCoordinateSpan()
+        nearSpan.latitudeDelta = 1
+        nearSpan.longitudeDelta = 1
+        mapView.region.span = nearSpan
+        mapView.addAnnotation(annotation!)
+    }
+
     
 }
-
+    
 
 extension CollectionViewController: UICollectionViewDelegate, UICollectionViewDataSource {
     func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
