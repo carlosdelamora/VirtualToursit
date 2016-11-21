@@ -10,6 +10,7 @@ import Foundation
 import UIKit
 import MapKit
 
+
 class MapViweController: UIViewController{
     
     let client = FlickFinderClient.sharedInstance()
@@ -50,8 +51,10 @@ class MapViweController: UIViewController{
             
             mapView.region.center.latitude = regionDictionary["latitude"]!
             mapView.region.center.longitude = regionDictionary["longitude"]!
-            mapView.region.span.latitudeDelta = regionDictionary["latitudeDelta"]!
-            mapView.region.span.longitudeDelta = regionDictionary["longitudeDelta"]!
+            var span = MKCoordinateSpan()
+            span.latitudeDelta = regionDictionary["latitudeDelta"]!
+            span.longitudeDelta = regionDictionary["longitudeDelta"]!
+            mapView.region.span = span
             print("the view will appear the latutude delta is \(regionDictionary["latitudeDelta"]!)")
             print(mapView.region.span.latitudeDelta)
         }
@@ -89,10 +92,9 @@ class MapViweController: UIViewController{
         //get the gesture
         let longGesture = mapView.gestureRecognizers!.first
         
-        let appDelegate = UIApplication.shared.delegate as! AppDelegate
-        print("\(appDelegate.active!)")
+        
         //meake sure the gesture is at the begining of the state when it gets called to avoid calling more than once. 
-        if longGesture?.state == UIGestureRecognizerState.began && appDelegate.active!{
+        if longGesture?.state == UIGestureRecognizerState.began{
             // get the phone coordinates of the gesture
             let viewCoordinates = longGesture?.location(in: mapView)
             //translate the coordinates into map coordinates
@@ -101,8 +103,6 @@ class MapViweController: UIViewController{
             annotation.coordinate = mapCoordinates
             annotations.append(annotation)
             mapView.addAnnotation(annotation)
-            print("\(appDelegate.active!)")
-            //print("drop a pin in \(viewCoordinates) the map coordinates \(mapCoordinates)")
             
         }
         
