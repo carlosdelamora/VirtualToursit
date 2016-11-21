@@ -15,7 +15,7 @@ class MapViweController: UIViewController{
     let client = FlickFinderClient.sharedInstance()
     var editMode = false
     var annotations = [MKPointAnnotation]()
-    
+    var regionDictionary = [String: Double]()
     
     @IBOutlet weak var mapView: MKMapView!
     
@@ -41,8 +41,21 @@ class MapViweController: UIViewController{
         mapView.addAnnotations(annotations)
         viewToDeletePins.alpha = 0.5
         
-            }
+        }
     
+    override func viewWillAppear(_ animated: Bool) {
+        
+        //if the region has been set before we want persistance
+        if let regionDictionary = UserDefaults.standard.value(forKey: "mapRegion") as? [String: Double]{
+            
+            mapView.region.center.latitude = regionDictionary["latitude"]!
+            mapView.region.center.longitude = regionDictionary["longitude"]!
+            mapView.region.span.latitudeDelta = regionDictionary["latitudeDelta"]!
+            mapView.region.span.longitudeDelta = regionDictionary["longitudeDelta"]!
+            print("the view will appear the latutude delta is \(regionDictionary["latitudeDelta"]!)")
+            print(mapView.region.span.latitudeDelta)
+        }
+    }
 
     
     @IBAction func editAction(_ sender: Any) {
@@ -76,8 +89,10 @@ class MapViweController: UIViewController{
         //get the gesture
         let longGesture = mapView.gestureRecognizers!.first
         
+        let appDelegate = UIApplication.shared.delegate as! AppDelegate
+        print("\(appDelegate.active!)")
         //meake sure the gesture is at the begining of the state when it gets called to avoid calling more than once. 
-        if longGesture?.state == UIGestureRecognizerState.began{
+        if longGesture?.state == UIGestureRecognizerState.began && appDelegate.active!{
             // get the phone coordinates of the gesture
             let viewCoordinates = longGesture?.location(in: mapView)
             //translate the coordinates into map coordinates
@@ -86,7 +101,9 @@ class MapViweController: UIViewController{
             annotation.coordinate = mapCoordinates
             annotations.append(annotation)
             mapView.addAnnotation(annotation)
-            print("drop a pin in \(viewCoordinates) the map coordinates \(mapCoordinates)")
+            print("\(appDelegate.active!)")
+            //print("drop a pin in \(viewCoordinates) the map coordinates \(mapCoordinates)")
+            
         }
         
     }
@@ -169,6 +186,17 @@ extension MapViweController: MKMapViewDelegate{
         navigationItem.backBarButtonItem = backButton
 
         print("\(jsonData)")
+    }
+    
+    
+    //get persistent data for the region 
+    func mapView(_ mapView: MKMapView, regionDidChangeAnimated animated: Bool) {
+        regionDictionary["latitude"] = mapView.region.center.latitude
+        regionDictionary["longitude"] = mapView.region.center.longitude
+        regionDictionary["latitudeDelta"] = mapView.region.span.latitudeDelta
+        regionDictionary["longitudeDelta"] = mapView.region.span.longitudeDelta
+        UserDefaults.standard.set(regionDictionary, forKey: "mapRegion")
+        print("\(regionDictionary)")
     }
     
 }
