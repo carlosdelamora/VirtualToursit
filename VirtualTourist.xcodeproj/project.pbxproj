@@ -18,6 +18,11 @@
 		CAB97DC71DDFB5BA00C9EACA /* FlickFinderClient.swift in Sources */ = {isa = PBXBuildFile; fileRef = CAB97DC61DDFB5BA00C9EACA /* FlickFinderClient.swift */; };
 		CAB97DC91DE0B3C200C9EACA /* GCD.swift in Sources */ = {isa = PBXBuildFile; fileRef = CAB97DC81DE0B3C200C9EACA /* GCD.swift */; };
 		CAB97DCB1DE3E20C00C9EACA /* CoreDataStack.swift in Sources */ = {isa = PBXBuildFile; fileRef = CAB97DCA1DE3E20C00C9EACA /* CoreDataStack.swift */; };
+		CAB97DCE1DE3EEED00C9EACA /* Model.xcdatamodeld in Sources */ = {isa = PBXBuildFile; fileRef = CAB97DCC1DE3EEED00C9EACA /* Model.xcdatamodeld */; };
+		CAB97DD41DE4B4E400C9EACA /* Photo+CoreDataClass.swift in Sources */ = {isa = PBXBuildFile; fileRef = CAB97DD01DE4B4E400C9EACA /* Photo+CoreDataClass.swift */; };
+		CAB97DD51DE4B4E400C9EACA /* Photo+CoreDataProperties.swift in Sources */ = {isa = PBXBuildFile; fileRef = CAB97DD11DE4B4E400C9EACA /* Photo+CoreDataProperties.swift */; };
+		CAB97DD61DE4B4E400C9EACA /* Pin+CoreDataClass.swift in Sources */ = {isa = PBXBuildFile; fileRef = CAB97DD21DE4B4E400C9EACA /* Pin+CoreDataClass.swift */; };
+		CAB97DD71DE4B4E400C9EACA /* Pin+CoreDataProperties.swift in Sources */ = {isa = PBXBuildFile; fileRef = CAB97DD31DE4B4E400C9EACA /* Pin+CoreDataProperties.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -34,6 +39,11 @@
 		CAB97DC61DDFB5BA00C9EACA /* FlickFinderClient.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = FlickFinderClient.swift; sourceTree = "<group>"; };
 		CAB97DC81DE0B3C200C9EACA /* GCD.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = GCD.swift; sourceTree = "<group>"; };
 		CAB97DCA1DE3E20C00C9EACA /* CoreDataStack.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CoreDataStack.swift; sourceTree = "<group>"; };
+		CAB97DCD1DE3EEED00C9EACA /* Model.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = Model.xcdatamodel; sourceTree = "<group>"; };
+		CAB97DD01DE4B4E400C9EACA /* Photo+CoreDataClass.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "Photo+CoreDataClass.swift"; sourceTree = "<group>"; };
+		CAB97DD11DE4B4E400C9EACA /* Photo+CoreDataProperties.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "Photo+CoreDataProperties.swift"; sourceTree = "<group>"; };
+		CAB97DD21DE4B4E400C9EACA /* Pin+CoreDataClass.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "Pin+CoreDataClass.swift"; sourceTree = "<group>"; };
+		CAB97DD31DE4B4E400C9EACA /* Pin+CoreDataProperties.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "Pin+CoreDataProperties.swift"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -50,6 +60,10 @@
 		CAB97D9E1DDCBD3F00C9EACA = {
 			isa = PBXGroup;
 			children = (
+				CAB97DD01DE4B4E400C9EACA /* Photo+CoreDataClass.swift */,
+				CAB97DD11DE4B4E400C9EACA /* Photo+CoreDataProperties.swift */,
+				CAB97DD21DE4B4E400C9EACA /* Pin+CoreDataClass.swift */,
+				CAB97DD31DE4B4E400C9EACA /* Pin+CoreDataProperties.swift */,
 				CAB97DA91DDCBD3F00C9EACA /* VirtualTourist */,
 				CAB97DA81DDCBD3F00C9EACA /* Products */,
 			);
@@ -67,8 +81,10 @@
 			isa = PBXGroup;
 			children = (
 				CAB97DAA1DDCBD3F00C9EACA /* AppDelegate.swift */,
-				CAB97DCA1DE3E20C00C9EACA /* CoreDataStack.swift */,
 				CAB97DC81DE0B3C200C9EACA /* GCD.swift */,
+				CAB97DCF1DE3EEF700C9EACA /* model */,
+				CAB97DCA1DE3E20C00C9EACA /* CoreDataStack.swift */,
+				CAB97DCC1DE3EEED00C9EACA /* Model.xcdatamodeld */,
 				CAB97DC11DDE61F700C9EACA /* Objects */,
 				CAB97DC01DDE61E100C9EACA /* Controllers */,
 				CAB97DBC1DDCD21400C9EACA /* MapViewController.swift */,
@@ -96,6 +112,13 @@
 				CAB97DC61DDFB5BA00C9EACA /* FlickFinderClient.swift */,
 			);
 			name = Objects;
+			sourceTree = "<group>";
+		};
+		CAB97DCF1DE3EEF700C9EACA /* model */ = {
+			isa = PBXGroup;
+			children = (
+			);
+			name = model;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -171,12 +194,17 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				CAB97DD41DE4B4E400C9EACA /* Photo+CoreDataClass.swift in Sources */,
 				CAB97DC91DE0B3C200C9EACA /* GCD.swift in Sources */,
 				CAB97DC71DDFB5BA00C9EACA /* FlickFinderClient.swift in Sources */,
 				CAB97DC51DDFB3E100C9EACA /* Constants.swift in Sources */,
 				CAB97DBF1DDE436200C9EACA /* CollectionViewController.swift in Sources */,
 				CAB97DAB1DDCBD3F00C9EACA /* AppDelegate.swift in Sources */,
+				CAB97DCE1DE3EEED00C9EACA /* Model.xcdatamodeld in Sources */,
 				CAB97DBD1DDCD21400C9EACA /* MapViewController.swift in Sources */,
+				CAB97DD51DE4B4E400C9EACA /* Photo+CoreDataProperties.swift in Sources */,
+				CAB97DD61DE4B4E400C9EACA /* Pin+CoreDataClass.swift in Sources */,
+				CAB97DD71DE4B4E400C9EACA /* Pin+CoreDataProperties.swift in Sources */,
 				CAB97DC31DDE624100C9EACA /* CollectionCell.swift in Sources */,
 				CAB97DCB1DE3E20C00C9EACA /* CoreDataStack.swift in Sources */,
 			);
@@ -344,6 +372,19 @@
 			defaultConfigurationIsVisible = 0;
 		};
 /* End XCConfigurationList section */
+
+/* Begin XCVersionGroup section */
+		CAB97DCC1DE3EEED00C9EACA /* Model.xcdatamodeld */ = {
+			isa = XCVersionGroup;
+			children = (
+				CAB97DCD1DE3EEED00C9EACA /* Model.xcdatamodel */,
+			);
+			currentVersion = CAB97DCD1DE3EEED00C9EACA /* Model.xcdatamodel */;
+			path = Model.xcdatamodeld;
+			sourceTree = "<group>";
+			versionGroupType = wrapper.xcdatamodel;
+		};
+/* End XCVersionGroup section */
 	};
 	rootObject = CAB97D9F1DDCBD3F00C9EACA /* Project object */;
 }
