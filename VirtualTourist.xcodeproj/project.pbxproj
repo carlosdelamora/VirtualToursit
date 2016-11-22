@@ -17,6 +17,7 @@
 		CAB97DC51DDFB3E100C9EACA /* Constants.swift in Sources */ = {isa = PBXBuildFile; fileRef = CAB97DC41DDFB3E100C9EACA /* Constants.swift */; };
 		CAB97DC71DDFB5BA00C9EACA /* FlickFinderClient.swift in Sources */ = {isa = PBXBuildFile; fileRef = CAB97DC61DDFB5BA00C9EACA /* FlickFinderClient.swift */; };
 		CAB97DC91DE0B3C200C9EACA /* GCD.swift in Sources */ = {isa = PBXBuildFile; fileRef = CAB97DC81DE0B3C200C9EACA /* GCD.swift */; };
+		CAB97DCB1DE3E20C00C9EACA /* CoreDataStack.swift in Sources */ = {isa = PBXBuildFile; fileRef = CAB97DCA1DE3E20C00C9EACA /* CoreDataStack.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -32,6 +33,7 @@
 		CAB97DC41DDFB3E100C9EACA /* Constants.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Constants.swift; sourceTree = "<group>"; };
 		CAB97DC61DDFB5BA00C9EACA /* FlickFinderClient.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = FlickFinderClient.swift; sourceTree = "<group>"; };
 		CAB97DC81DE0B3C200C9EACA /* GCD.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = GCD.swift; sourceTree = "<group>"; };
+		CAB97DCA1DE3E20C00C9EACA /* CoreDataStack.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CoreDataStack.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -65,6 +67,7 @@
 			isa = PBXGroup;
 			children = (
 				CAB97DAA1DDCBD3F00C9EACA /* AppDelegate.swift */,
+				CAB97DCA1DE3E20C00C9EACA /* CoreDataStack.swift */,
 				CAB97DC81DE0B3C200C9EACA /* GCD.swift */,
 				CAB97DC11DDE61F700C9EACA /* Objects */,
 				CAB97DC01DDE61E100C9EACA /* Controllers */,
@@ -175,6 +178,7 @@
 				CAB97DAB1DDCBD3F00C9EACA /* AppDelegate.swift in Sources */,
 				CAB97DBD1DDCD21400C9EACA /* MapViewController.swift in Sources */,
 				CAB97DC31DDE624100C9EACA /* CollectionCell.swift in Sources */,
+				CAB97DCB1DE3E20C00C9EACA /* CoreDataStack.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
