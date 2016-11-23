@@ -113,7 +113,7 @@
                                     <inset key="sectionInset" minX="0.0" minY="0.0" maxX="0.0" maxY="0.0"/>
                                 </collectionViewFlowLayout>
                                 <cells>
-                                    <collectionViewCell opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" restorationIdentifier="Cell" id="tGC-dM-oId">
+                                    <collectionViewCell opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" restorationIdentifier="Cell" id="tGC-dM-oId" customClass="CollectionCell" customModule="VirtualTourist" customModuleProvider="target">
                                         <rect key="frame" x="0.0" y="0.0" width="96" height="94"/>
                                         <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
                                         <view key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center">
@@ -133,6 +133,9 @@
                                             <constraint firstItem="SFY-tp-SQ5" firstAttribute="centerY" secondItem="tGC-dM-oId" secondAttribute="centerY" id="d3u-VV-hEY"/>
                                             <constraint firstItem="SFY-tp-SQ5" firstAttribute="centerX" secondItem="tGC-dM-oId" secondAttribute="centerX" id="ioc-TZ-VYG"/>
                                         </constraints>
+                                        <connections>
+                                            <outlet property="imageView" destination="SFY-tp-SQ5" id="0ze-6J-TBc"/>
+                                        </connections>
                                     </collectionViewCell>
                                 </cells>
                             </collectionView>

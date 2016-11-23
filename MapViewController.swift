@@ -9,7 +9,7 @@
 import Foundation
 import UIKit
 import MapKit
-
+import CoreData
 
 class MapViweController: UIViewController{
     
@@ -17,6 +17,8 @@ class MapViweController: UIViewController{
     var editMode = false
     var annotations = [MKPointAnnotation]()
     var regionDictionary = [String: Double]()
+    var context : NSManagedObjectContext? = nil
+    var pins = [Pin]()
     
     @IBOutlet weak var mapView: MKMapView!
     
@@ -38,14 +40,17 @@ class MapViweController: UIViewController{
         longGesture.minimumPressDuration = CFTimeInterval(0.5)
         mapView.addGestureRecognizer(longGesture)
         
-        //populate the map
-        mapView.addAnnotations(annotations)
+        
         viewToDeletePins.alpha = 0.5
+        
+        let appDelegate = UIApplication.shared.delegate as! AppDelegate
+        let stack = appDelegate.stack
+        context = stack?.context
         
         }
     
     override func viewWillAppear(_ animated: Bool) {
-        
+        super.viewWillAppear(true)
         //if the region has been set before we want persistance
         if let regionDictionary = UserDefaults.standard.value(forKey: "mapRegion") as? [String: Double]{
             
@@ -58,6 +63,23 @@ class MapViweController: UIViewController{
             print("the view will appear the latutude delta is \(regionDictionary["latitudeDelta"]!)")
             print(mapView.region.span.latitudeDelta)
         }
+        
+        //populate the map
+        let fetchRequest = NSFetchRequest<NSFetchRequestResult>(entityName: "Pin")
+        do{
+            if let results = try context?.fetch(fetchRequest) as? [Pin]{
+                pins = results
+            }
+        }catch{
+            fatalError("can not obtain the Pins")
+        }
+        
+        annotations = pins.map({$0.annotation})
+        print("we have this number of annotations \(annotations.count)")
+        mapView.addAnnotation(annotations.first!)
+        print("this is the first coordinate annotation \(pins.first!.annotation.coordinate)")
+        mapView.addAnnotations(annotations)
+        
     }
 
     
@@ -103,7 +125,10 @@ class MapViweController: UIViewController{
             annotation.coordinate = mapCoordinates
             annotations.append(annotation)
             mapView.addAnnotation(annotation)
-            
+            print("pin droped in \(annotation.coordinate)")
+            //create Pin to save it into core Data
+            let pin = Pin(latitude: annotation.coordinate.latitude, longitude: annotation.coordinate.longitude, context: context!)
+            print("the new pin deropded has coordinates\(pin.annotation.coordinate)")
         }
         
     }
@@ -136,7 +161,9 @@ extension MapViweController: MKMapViewDelegate{
     //we use this delegate function to respond to taps on the pins
     func mapView(_ mapView: MKMapView, didSelect view: MKAnnotationView) {
         if editMode{
+            //we want to delete the pin
             mapView.removeAnnotation(view.annotation!)
+            
         }else{
            // we need the parameters to search near the annotation
            let methodParameters = [

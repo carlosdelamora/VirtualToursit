@@ -2,7 +2,7 @@
 //  Pin+CoreDataClass.swift
 //  VirtualTourist
 //
-//  Created by Carlos De la mora on 11/22/16.
+//  Created by Carlos De la mora on 11/23/16.
 //  Copyright © 2016 Carlos De la mora. All rights reserved.
 //
 
@@ -12,7 +12,11 @@ import MapKit
 
 public class Pin: NSManagedObject {
     
-    var annotation = MKPointAnnotation()
+    var annotation : MKPointAnnotation{
+        let anAnnotation = MKPointAnnotation()
+        anAnnotation.coordinate = CLLocationCoordinate2D(latitude: self.latitude, longitude: self.longitude)
+        return anAnnotation
+    }
     
     convenience init(latitude:Double, longitude: Double, context: NSManagedObjectContext){
         if let ent = NSEntityDescription.entity(forEntityName: "Pin", in: context){
@@ -23,8 +27,6 @@ public class Pin: NSManagedObject {
             fatalError("there was an error with the initalization")
         }
         
-        self.annotation.coordinate = CLLocationCoordinate2D(latitude: latitude, longitude: longitude)
     }
-    
 
 }
