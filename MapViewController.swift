@@ -145,12 +145,11 @@ extension MapViweController: MKMapViewDelegate{
         
         let reuseId = "pin"
         var pinView = mapView.dequeueReusableAnnotationView(withIdentifier: reuseId) as? MKPinAnnotationView
-        if pinView == nil{ //if the pin is not present on the view it is nil?
+        if pinView == nil{
+            //if the pin is not present on the mapView it is nil
             pinView = MKPinAnnotationView(annotation: annotation, reuseIdentifier: reuseId)
-            //pinView!.canShowCallout = true
             pinView!.animatesDrop = true
             pinView!.pinTintColor = .green
-            //pinView!.rightCalloutAccessoryView = UIButton(type: .detailDisclosure)
         }else{
             pinView!.annotation = annotation
         }
@@ -158,25 +157,34 @@ extension MapViweController: MKMapViewDelegate{
         return pinView
     }
     
+    func pinFromAnnotation(_ annotation: MKAnnotation)-> Pin?{
+        
+        //we get the current array of pins
+        let fetchRequest = NSFetchRequest<NSFetchRequestResult>(entityName: "Pin")
+        do{
+            if let results = try context?.fetch(fetchRequest) as? [Pin]{
+                pins = results
+            }
+        }catch{
+            fatalError("can not obtain the Pins")
+        }
+        
+        //we now check wich pins have the same annotation thant the one that was errased
+        let pinSelected = pins.filter({ $0.annotation.coordinate.latitude ==
+            annotation.coordinate.latitude && $0.annotation.coordinate.longitude == annotation.coordinate.longitude}).first
+        
+        return pinSelected
+    }
+    
     //we use this delegate function to respond to taps on the pins
     func mapView(_ mapView: MKMapView, didSelect view: MKAnnotationView) {
-        if editMode{
         
-            //we get the current array of pins 
-            let fetchRequest = NSFetchRequest<NSFetchRequestResult>(entityName: "Pin")
-            do{
-                if let results = try context?.fetch(fetchRequest) as? [Pin]{
-                    pins = results
-                }
-            }catch{
-                fatalError("can not obtain the Pins")
-            }
-            /*print("\(pins.count) is the number of pins" )
-            let newPins = pins.filter({$0.annotation.coordinate.latitude - (view.annotation?.coordinate.latitude)! == 0})*/
+        let pinSelected = pinFromAnnotation(view.annotation as! MKPointAnnotation)
+        
+        
+        if editMode{
             
-            //we now check wich pins have the same annotation thant the one that was errased
-            let pinToRemove = pins.filter({ $0.annotation.coordinate.latitude == view.annotation!.coordinate.latitude && $0.annotation.coordinate.longitude == view.annotation!.coordinate.longitude}).first
-            if let pinToRemove = pinToRemove {
+            if let pinToRemove = pinSelected {
                 context?.delete(pinToRemove)
                 print("the pin was removed")
             }
@@ -185,7 +193,8 @@ extension MapViweController: MKMapViewDelegate{
             mapView.removeAnnotation(view.annotation!)
             
         }else{
-           // we need the parameters to search near the annotation
+           
+            // we need the parameters to search near the annotation
            let methodParameters = [
                 Constants.FlickrParameterKeys.Method: Constants.FlickrParameterValues.SearchMethod,
                 Constants.FlickrParameterKeys.APIKey: Constants.FlickrParameterValues.APIKey,
@@ -195,8 +204,9 @@ extension MapViweController: MKMapViewDelegate{
                 Constants.FlickrParameterKeys.Format: Constants.FlickrParameterValues.ResponseFormat,
                 Constants.FlickrParameterKeys.NoJSONCallback: Constants.FlickrParameterValues.DisableJSONCallback
             ] 
-
-           let method = client.flickURLFromParameters(methodParameters)
+            
+            print("flickerGetMethod should be called in the map view did select")
+            let method = client.flickURLFromParameters(methodParameters)
             client.flickGetMethod(method,view){jsonData,view, error in
                 self.closureForGetMethod(jsonData, view, error as NSError?)
             }
@@ -232,7 +242,8 @@ extension MapViweController: MKMapViewDelegate{
         backButton.setTitleTextAttributes([NSFontAttributeName: UIFont(name: "Helvetica", size: 20)!], for: UIControlState.normal)
         navigationItem.backBarButtonItem = backButton
         //set the mapView in the controller to the right region
-        controller.annotation = view.annotation
+        //controller.annotation = view.annotation!
+        controller.pin = pinFromAnnotation(view.annotation!)
     }
     
     

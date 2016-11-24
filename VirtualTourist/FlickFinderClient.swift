@@ -39,7 +39,7 @@ class FlickFinderClient:NSObject{
     }
     
     func flickGetMethod(_ methodURL: URL, _ view: MKAnnotationView, _ completionHandeler: @escaping ([String: AnyObject], MKAnnotationView, Error?)-> Void){
-        
+        print("flickerGetMethod was called")
         let session = URLSession.shared
         let request = URLRequest(url: methodURL)
         // create network request
@@ -104,8 +104,8 @@ class FlickFinderClient:NSObject{
         do{jsonData = try JSONSerialization.jsonObject(with: data, options:.allowFragments)}catch{
             print("the json data could not be obtained")
         }
-        //print(jsonData)
-        //print("here is the json Data")
+        
+        print("here is the jsonData closureForTask \(jsonData)")
         return jsonData as? [String:AnyObject]
     }
 

@@ -13,16 +13,17 @@ import UIKit
 
 class CollectionViewController: UIViewController{
     
-    var annotation: MKAnnotation?
+    //var annotation: MKAnnotation?
+    var pin: Pin?
     @IBOutlet weak var mapView: MKMapView!
     
     override func viewDidLoad() {
-        mapView.region.center = annotation!.coordinate
+        mapView.region.center = pin!.annotation.coordinate
         var nearSpan = MKCoordinateSpan()
         nearSpan.latitudeDelta = 1
         nearSpan.longitudeDelta = 1
         mapView.region.span = nearSpan
-        mapView.addAnnotation(annotation!)
+        mapView.addAnnotation(pin!.annotation)
     }
 
     
