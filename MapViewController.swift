@@ -234,20 +234,73 @@ extension MapViweController: MKMapViewDelegate{
             return
         }
         
-        let controller = storyboard?.instantiateViewController(withIdentifier: "CollectionViewController") as! CollectionViewController
+        let thePin = self.pinFromAnnotation(view.annotation!)
+        let controller = self.storyboard?.instantiateViewController(withIdentifier: "CollectionViewController") as! CollectionViewController
+        
+        performUIUpdatesOnMain {
+        
         self.navigationController?.pushViewController(controller, animated: true)
         //set the button with the right title and font
         let backButton = UIBarButtonItem()
         backButton.title = "OK"
         backButton.setTitleTextAttributes([NSFontAttributeName: UIFont(name: "Helvetica", size: 20)!], for: UIControlState.normal)
-        navigationItem.backBarButtonItem = backButton
-        //set the mapView in the controller to the right region
-        //controller.annotation = view.annotation!
-        controller.pin = pinFromAnnotation(view.annotation!)
+        controller.navigationItem.backBarButtonItem = backButton
+        
+        //set the pin in the controller
+        controller.pin = thePin
+        
+        }
+        
+        // get the photos and instanciate them
+        
+        /* GUARD: Is the "photos" key in our  jsonData */
+        guard let photosDictionary = jsonData[Constants.FlickrResponseKeys.Photos] as? [String:AnyObject] else {
+            print("Cannot find key '\(Constants.FlickrResponseKeys.Photos)' in \(jsonData)")
+            return
+        }
+        
+        /* GUARD: Is the "photo" key in photosDictionary? */
+        guard let photosDictionaryArray = photosDictionary[Constants.FlickrResponseKeys.Photo] as? [[String: AnyObject]] else {
+            print("Cannot find key '\(Constants.FlickrResponseKeys.Photo)' in \(jsonData)")
+            return
+        }
+        
+        if photosDictionaryArray.count == 0 {
+            print("No Photos Found. Search Again.")
+            return
+        }else {
+            
+            func getDataFromArray(_ photoDictionary: [String: AnyObject]) -> Data?{
+                guard let imageUrlString = photoDictionary[Constants.FlickrResponseKeys.MediumURL] as? String else{
+                    print("the imageURLstring was not cast as a string we return nil for the data")
+                    return nil
+                }
+                
+                guard let url = URL(string: imageUrlString) else{
+                    print("the url was not cast as a string we return nil for the data")
+                    return nil
+                }
+                
+                guard let imageData = try? Data(contentsOf: url)else{
+                    return nil
+                }
+                
+                return imageData
+                
+            }
+            
+            let dataArray = photosDictionaryArray[0...27].map({ getDataFromArray($0)})
+            let noNullDataArray = dataArray.filter({$0 != nil})
+            let arrayOfPhotos = noNullDataArray.map({Photo($0!, thePin!, context!)})
+            
+            controller.array = arrayOfPhotos
+            print(" the number of photos in the arrayOfPhotos is \(arrayOfPhotos.count)")
+        
+        }
     }
     
     
-    //get persistent data for the region 
+    //get persistent data for the region
     func mapView(_ mapView: MKMapView, regionDidChangeAnimated animated: Bool) {
         regionDictionary["latitude"] = mapView.region.center.latitude
         regionDictionary["longitude"] = mapView.region.center.longitude
@@ -255,7 +308,7 @@ extension MapViweController: MKMapViewDelegate{
         regionDictionary["longitudeDelta"] = mapView.region.span.longitudeDelta
         UserDefaults.standard.set(regionDictionary, forKey: "mapRegion")
     }
-    
+        
 }
 
 

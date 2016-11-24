@@ -54,10 +54,10 @@ class FlickFinderClient:NSObject{
             }
             
             if (error != nil){
-                performUIUpdatesOnMain {
+            
                     //TODO: check for the error
                     completionHandeler([String: AnyObject](),view,error)
-                }
+                
                 
                 displayError("\(error)")
                 
@@ -69,9 +69,9 @@ class FlickFinderClient:NSObject{
             }
             
             //if there is no error we use this completion handeler on GCD
-            performUIUpdatesOnMain {
+            
                 completionHandeler(jsonData,view, nil)
-            }
+    
             
         }
         

@@ -15,6 +15,8 @@ class CollectionViewController: UIViewController{
     
     //var annotation: MKAnnotation?
     var pin: Pin?
+    var array = [Photo]()
+    
     @IBOutlet weak var mapView: MKMapView!
     
     override func viewDidLoad() {
@@ -24,19 +26,23 @@ class CollectionViewController: UIViewController{
         nearSpan.longitudeDelta = 1
         mapView.region.span = nearSpan
         mapView.addAnnotation(pin!.annotation)
+        print("the nomber of items in the array is \(array.count)")
     }
-
-    
 }
     
 
 extension CollectionViewController: UICollectionViewDelegate, UICollectionViewDataSource {
     func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
-        return 1//placeHolder
+        return min(27, array.count)
     }
     
     func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
-        let cell = collectionView.dequeueReusableCell(withReuseIdentifier: "Cell", for: indexPath)
+        let cell = collectionView.dequeueReusableCell(withReuseIdentifier: "Cell", for: indexPath) as!
+        CollectionCell
+        let photo = array[indexPath.row] 
+        let data = photo.imageData
+        let image = UIImage(data: data as! Data)
+        cell.imageView.image = image
         return cell
     }
 }
