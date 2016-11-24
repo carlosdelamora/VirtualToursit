@@ -161,6 +161,26 @@ extension MapViweController: MKMapViewDelegate{
     //we use this delegate function to respond to taps on the pins
     func mapView(_ mapView: MKMapView, didSelect view: MKAnnotationView) {
         if editMode{
+        
+            //we get the current array of pins 
+            let fetchRequest = NSFetchRequest<NSFetchRequestResult>(entityName: "Pin")
+            do{
+                if let results = try context?.fetch(fetchRequest) as? [Pin]{
+                    pins = results
+                }
+            }catch{
+                fatalError("can not obtain the Pins")
+            }
+            /*print("\(pins.count) is the number of pins" )
+            let newPins = pins.filter({$0.annotation.coordinate.latitude - (view.annotation?.coordinate.latitude)! == 0})*/
+            
+            //we now check wich pins have the same annotation thant the one that was errased
+            let pinToRemove = pins.filter({ $0.annotation.coordinate.latitude == view.annotation!.coordinate.latitude && $0.annotation.coordinate.longitude == view.annotation!.coordinate.longitude}).first
+            if let pinToRemove = pinToRemove {
+                context?.delete(pinToRemove)
+                print("the pin was removed")
+            }
+            
             //we want to delete the pin
             mapView.removeAnnotation(view.annotation!)
             
