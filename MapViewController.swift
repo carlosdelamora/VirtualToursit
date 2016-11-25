@@ -237,19 +237,7 @@ extension MapViweController: MKMapViewDelegate{
         let thePin = self.pinFromAnnotation(view.annotation!)
         let controller = self.storyboard?.instantiateViewController(withIdentifier: "CollectionViewController") as! CollectionViewController
         
-        performUIUpdatesOnMain {
         
-        self.navigationController?.pushViewController(controller, animated: true)
-        //set the button with the right title and font
-        let backButton = UIBarButtonItem()
-        backButton.title = "OK"
-        backButton.setTitleTextAttributes([NSFontAttributeName: UIFont(name: "Helvetica", size: 20)!], for: UIControlState.normal)
-        controller.navigationItem.backBarButtonItem = backButton
-        
-        //set the pin in the controller
-        controller.pin = thePin
-        
-        }
         
         // get the photos and instanciate them
         
@@ -291,9 +279,23 @@ extension MapViweController: MKMapViewDelegate{
             
             let dataArray = photosDictionaryArray[0...27].map({ getDataFromArray($0)})
             let noNullDataArray = dataArray.filter({$0 != nil})
-            let arrayOfPhotos = noNullDataArray.map({Photo($0!, thePin!, context!)})
-            
+            let arrayOfPhotos = noNullDataArray.map({Photo($0!, thePin!, self.context!)})
             controller.array = arrayOfPhotos
+            //set the pin in the controller
+            controller.pin = thePin
+            
+            performUIUpdatesOnMain {
+                
+                
+                self.navigationController?.pushViewController(controller, animated: true)
+                //set the button with the right title and font
+                let backButton = UIBarButtonItem()
+                backButton.title = "OK"
+                backButton.setTitleTextAttributes([NSFontAttributeName: UIFont(name: "Helvetica", size: 20)!], for: UIControlState.normal)
+                controller.navigationItem.backBarButtonItem = backButton
+                
+            }
+
             print(" the number of photos in the arrayOfPhotos is \(arrayOfPhotos.count)")
         
         }

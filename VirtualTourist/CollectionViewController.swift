@@ -18,6 +18,7 @@ class CollectionViewController: UIViewController{
     var array = [Photo]()
     
     @IBOutlet weak var mapView: MKMapView!
+    @IBOutlet weak var collectionView: UICollectionView!
     
     override func viewDidLoad() {
         mapView.region.center = pin!.annotation.coordinate
@@ -26,7 +27,15 @@ class CollectionViewController: UIViewController{
         nearSpan.longitudeDelta = 1
         mapView.region.span = nearSpan
         mapView.addAnnotation(pin!.annotation)
-        print("the nomber of items in the array is \(array.count)")
+        collectionView.delegate = self
+        collectionView.dataSource = self
+    }
+    
+    override func viewWillAppear(_ animated: Bool) {
+        super.viewWillAppear(true)
+         print("the nomber of items in the array is \(array.count)")
+        self.collectionView?.reloadData()
+
     }
 }
     
