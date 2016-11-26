@@ -13,11 +13,13 @@ import CoreData
 
 class CollectionViewController: UIViewController{
     
-    
+    var activityIndicator: UIActivityIndicatorView!
     let client = FlickFinderClient.sharedInstance()
     var pin: Pin?
     var array = [Photo]()
     var context : NSManagedObjectContext? = nil
+    var dataIsDownloading: Bool = true
+    var preliminatyPhotoArray = [Int]()
     
     @IBOutlet weak var mapView: MKMapView!
     @IBOutlet weak var collectionView: UICollectionView!
@@ -61,7 +63,10 @@ class CollectionViewController: UIViewController{
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(true)
          print("the nomber of items in the array is \(array.count)")
-        self.collectionView?.reloadData()
+        performUIUpdatesOnMain {
+            self.collectionView?.reloadData()
+        }
+        
 
     }
     
@@ -102,40 +107,48 @@ class CollectionViewController: UIViewController{
          }
      
          if photosDictionaryArray.count == 0 {
-         print("No Photos Found. Search Again.")
-         return
+             print("No Photos Found. Search Again.")
+             return
          }else {
-         
-         func getDataFromArray(_ photoDictionary: [String: AnyObject]) -> Data?{
-         guard let imageUrlString = photoDictionary[Constants.FlickrResponseKeys.MediumURL] as? String else{
-         print("the imageURLstring was not cast as a string we return nil for the data")
-         return nil
-         }
-         
-         guard let url = URL(string: imageUrlString) else{
-         print("the url was not cast as a string we return nil for the data")
-         return nil
-         }
-         
-         guard let imageData = try? Data(contentsOf: url)else{
-         return nil
-         }
-         
-         return imageData
-         
-         }
-         
-         let dataArray = photosDictionaryArray[0...27].map({ getDataFromArray($0)})
-         let noNullDataArray = dataArray.filter({$0 != nil})
-         array = noNullDataArray.map({Photo($0!, pin!, context!)})
             
-          //Do we need to perform uptadets in main queue? it does not seem to block if is not there 
-         performUIUpdatesOnMain {
-            self.collectionView?.reloadData()
-         }
-        print(" the number of photos in the arrayOfPhotos is \(array.count)")
+            //we use preliminaryPhotoArray to know as soon as possible how many pictures are there and know how many cells with activity views to present.
+             preliminatyPhotoArray = (1...photosDictionary.count).map({$0})
+             performUIUpdatesOnMain {
+                self.collectionView?.reloadData()
+             }
+            
+             func getDataFromArray(_ photoDictionary: [String: AnyObject]) -> Data?{
+                 guard let imageUrlString = photoDictionary[Constants.FlickrResponseKeys.MediumURL] as? String else{
+                 print("the imageURLstring was not cast as a string we return nil for the data")
+                 return nil
+                 }
          
-     }
+                 guard let url = URL(string: imageUrlString) else{
+                     print("the url was not cast as a string we return nil for the data")
+                     return nil
+                 }
+                 
+                 guard let imageData = try? Data(contentsOf: url)else{
+                     return nil
+                 }
+                 
+                 return imageData
+             
+             }
+             
+             let dataArray = photosDictionaryArray[0...27].map({ getDataFromArray($0)})
+             let noNullDataArray = dataArray.filter({$0 != nil})
+             array = noNullDataArray.map({Photo($0!, pin!, context!)})
+             dataIsDownloading = false
+              //Do we need to perform uptadets in main queue? it does not seem to block if is not there
+            performUIUpdatesOnMain {
+                self.collectionView?.reloadData()
+            }
+            
+            
+            print(" the number of photos in the arrayOfPhotos is \(array.count)")
+         
+         }
      }
     
     
@@ -145,17 +158,35 @@ class CollectionViewController: UIViewController{
 
 extension CollectionViewController: UICollectionViewDelegate, UICollectionViewDataSource {
     func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
-        return min(27, array.count)
+        return min(27, preliminatyPhotoArray.count)
     }
     
     func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
         let cell = collectionView.dequeueReusableCell(withReuseIdentifier: "Cell", for: indexPath) as!
         CollectionCell
-        let photo = array[indexPath.row]
-        let data = photo.imageData
-        let image = UIImage(data: data as! Data)
-        cell.imageView.image = image
+        if dataIsDownloading {
+            addActyIndicator(cell.imageView)
+        }else{
+            let photo = array[indexPath.row]
+            let data = photo.imageData
+            let image = UIImage(data: data as! Data)
+            cell.imageView.image = image
+            removeActivityIndicator()
+        }
         return cell
     }
+    
+    func addActyIndicator( _ cellView: UIImageView){
+        activityIndicator = UIActivityIndicatorView( frame: cellView.bounds)
+        activityIndicator.activityIndicatorViewStyle = .whiteLarge
+        activityIndicator.backgroundColor = UIColor(red: 0, green: 0.5, blue: 0.5, alpha: 0.25)
+        activityIndicator.startAnimating()
+        cellView.addSubview(activityIndicator)
+    }
+    
+    func removeActivityIndicator(){
+        activityIndicator.removeFromSuperview()
+    }
+    
 }
 
