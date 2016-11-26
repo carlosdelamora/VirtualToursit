@@ -42,7 +42,8 @@ class MapViweController: UIViewController{
         
         
         viewToDeletePins.alpha = 0.5
-        
+       
+        // set the context
         let appDelegate = UIApplication.shared.delegate as! AppDelegate
         let stack = appDelegate.stack
         context = stack?.context
@@ -76,8 +77,8 @@ class MapViweController: UIViewController{
         
         annotations = pins.map({$0.annotation})
         print("we have this number of annotations \(annotations.count)")
-        mapView.addAnnotation(annotations.first!)
-        print("this is the first coordinate annotation \(pins.first!.annotation.coordinate)")
+        //mapView.addAnnotation(annotations.first!)
+       
         mapView.addAnnotations(annotations)
         
     }
@@ -193,114 +194,24 @@ extension MapViweController: MKMapViewDelegate{
             mapView.removeAnnotation(view.annotation!)
             
         }else{
-           
-            // we need the parameters to search near the annotation
-           let methodParameters = [
-                Constants.FlickrParameterKeys.Method: Constants.FlickrParameterValues.SearchMethod,
-                Constants.FlickrParameterKeys.APIKey: Constants.FlickrParameterValues.APIKey,
-                Constants.FlickrParameterKeys.BoundingBox: bboxString(view.annotation?.coordinate.latitude, view.annotation?.coordinate.longitude),
-                Constants.FlickrParameterKeys.SafeSearch: Constants.FlickrParameterValues.UseSafeSearch,
-                Constants.FlickrParameterKeys.Extras: Constants.FlickrParameterValues.MediumURL,
-                Constants.FlickrParameterKeys.Format: Constants.FlickrParameterValues.ResponseFormat,
-                Constants.FlickrParameterKeys.NoJSONCallback: Constants.FlickrParameterValues.DisableJSONCallback
-            ] 
             
-            print("flickerGetMethod should be called in the map view did select")
-            let method = client.flickURLFromParameters(methodParameters)
-            client.flickGetMethod(method,view){jsonData,view, error in
-                self.closureForGetMethod(jsonData, view, error as NSError?)
-            }
-        }
-            
-    }
-    
-    private func bboxString(_ latitude: Double?, _ longitude: Double?) -> String {
-        // ensure bbox is bounded by minimum and maximums
-        if let latitude = latitude, let longitude = longitude{
-            let minimumLon = max(longitude - Constants.Flickr.SearchBBoxHalfWidth, Constants.Flickr.SearchLonRange.0)
-            let minimumLat = max(latitude - Constants.Flickr.SearchBBoxHalfHeight, Constants.Flickr.SearchLatRange.0)
-            let maximumLon = min(longitude + Constants.Flickr.SearchBBoxHalfWidth, Constants.Flickr.SearchLonRange.1)
-            let maximumLat = min(latitude + Constants.Flickr.SearchBBoxHalfHeight, Constants.Flickr.SearchLatRange.1)
-            return "\(minimumLon),\(minimumLat),\(maximumLon),\(maximumLat)"
-        } else {
-            return "0,0,0,0"
-        }
-    }
+            // find the pin among those that have been posted on the map that are already in the data core
+            let thePin = pinFromAnnotation(view.annotation!)
+            let controller = self.storyboard?.instantiateViewController(withIdentifier: "CollectionViewController") as! CollectionViewController
 
-    func closureForGetMethod(_ jsonData:[String: AnyObject], _ view:MKAnnotationView, _ error: NSError?){
-        
-        guard (error == nil) else{
-            print("There was an error in closure ForGetMethod \(error)")
-            return
-        }
-        
-        let thePin = self.pinFromAnnotation(view.annotation!)
-        let controller = self.storyboard?.instantiateViewController(withIdentifier: "CollectionViewController") as! CollectionViewController
-        
-        
-        
-        // get the photos and instanciate them
-        
-        /* GUARD: Is the "photos" key in our  jsonData */
-        guard let photosDictionary = jsonData[Constants.FlickrResponseKeys.Photos] as? [String:AnyObject] else {
-            print("Cannot find key '\(Constants.FlickrResponseKeys.Photos)' in \(jsonData)")
-            return
-        }
-        
-        /* GUARD: Is the "photo" key in photosDictionary? */
-        guard let photosDictionaryArray = photosDictionary[Constants.FlickrResponseKeys.Photo] as? [[String: AnyObject]] else {
-            print("Cannot find key '\(Constants.FlickrResponseKeys.Photo)' in \(jsonData)")
-            return
-        }
-        
-        if photosDictionaryArray.count == 0 {
-            print("No Photos Found. Search Again.")
-            return
-        }else {
-            
-            func getDataFromArray(_ photoDictionary: [String: AnyObject]) -> Data?{
-                guard let imageUrlString = photoDictionary[Constants.FlickrResponseKeys.MediumURL] as? String else{
-                    print("the imageURLstring was not cast as a string we return nil for the data")
-                    return nil
-                }
-                
-                guard let url = URL(string: imageUrlString) else{
-                    print("the url was not cast as a string we return nil for the data")
-                    return nil
-                }
-                
-                guard let imageData = try? Data(contentsOf: url)else{
-                    return nil
-                }
-                
-                return imageData
-                
-            }
-            
-            let dataArray = photosDictionaryArray[0...27].map({ getDataFromArray($0)})
-            let noNullDataArray = dataArray.filter({$0 != nil})
-            let arrayOfPhotos = noNullDataArray.map({Photo($0!, thePin!, self.context!)})
-            controller.array = arrayOfPhotos
             //set the pin in the controller
             controller.pin = thePin
-            
-            performUIUpdatesOnMain {
-                
-                
-                self.navigationController?.pushViewController(controller, animated: true)
-                //set the button with the right title and font
-                let backButton = UIBarButtonItem()
-                backButton.title = "OK"
-                backButton.setTitleTextAttributes([NSFontAttributeName: UIFont(name: "Helvetica", size: 20)!], for: UIControlState.normal)
-                controller.navigationItem.backBarButtonItem = backButton
-                
-            }
 
-            print(" the number of photos in the arrayOfPhotos is \(arrayOfPhotos.count)")
-        
+            self.navigationController?.pushViewController(controller, animated: true)
+            
+            //set the button with the right title and font
+            let backButton = UIBarButtonItem()
+            backButton.title = "OK"
+            backButton.setTitleTextAttributes([NSFontAttributeName: UIFont(name: "Helvetica", size: 20)!], for: UIControlState.normal)
+            controller.navigationItem.backBarButtonItem = backButton
         }
+        
     }
-    
     
     //get persistent data for the region
     func mapView(_ mapView: MKMapView, regionDidChangeAnimated animated: Bool) {

@@ -38,7 +38,7 @@ class FlickFinderClient:NSObject{
         return components.url!
     }
     
-    func flickGetMethod(_ methodURL: URL, _ view: MKAnnotationView, _ completionHandeler: @escaping ([String: AnyObject], MKAnnotationView, Error?)-> Void){
+    func flickGetMethod(_ methodURL: URL, _ completionHandeler: @escaping ([String: AnyObject], Error?)-> Void){
         print("flickerGetMethod was called")
         let session = URLSession.shared
         let request = URLRequest(url: methodURL)
@@ -56,7 +56,7 @@ class FlickFinderClient:NSObject{
             if (error != nil){
             
                     //TODO: check for the error
-                    completionHandeler([String: AnyObject](),view,error)
+                    completionHandeler([String: AnyObject](),error)
                 
                 
                 displayError("\(error)")
@@ -70,7 +70,7 @@ class FlickFinderClient:NSObject{
             
             //if there is no error we use this completion handeler on GCD
             
-                completionHandeler(jsonData,view, nil)
+                completionHandeler(jsonData, nil)
     
             
         }
