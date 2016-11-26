@@ -19,7 +19,7 @@ class CollectionViewController: UIViewController{
     var array = [Photo]()
     var context : NSManagedObjectContext? = nil
     var dataIsDownloading: Bool = true
-    var preliminatyPhotoArray = [Int]()
+    var preliminaryPhotoArray = [Int]()
     
     @IBOutlet weak var mapView: MKMapView!
     @IBOutlet weak var collectionView: UICollectionView!
@@ -112,7 +112,9 @@ class CollectionViewController: UIViewController{
          }else {
             
             //we use preliminaryPhotoArray to know as soon as possible how many pictures are there and know how many cells with activity views to present.
-             preliminatyPhotoArray = (1...photosDictionary.count).map({$0})
+             preliminaryPhotoArray = (1...photosDictionaryArray.count).map({$0})
+             print("preliminary photo array \(preliminaryPhotoArray.count) while photoDictionary has \(photosDictionaryArray.count)")
+            
              performUIUpdatesOnMain {
                 self.collectionView?.reloadData()
              }
@@ -158,7 +160,7 @@ class CollectionViewController: UIViewController{
 
 extension CollectionViewController: UICollectionViewDelegate, UICollectionViewDataSource {
     func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
-        return min(27, preliminatyPhotoArray.count)
+        return min(27, preliminaryPhotoArray.count)
     }
     
     func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
