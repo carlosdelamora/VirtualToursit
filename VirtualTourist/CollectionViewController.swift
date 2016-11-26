@@ -15,11 +15,13 @@ class CollectionViewController: UIViewController{
     
     var activityIndicator: UIActivityIndicatorView!
     let client = FlickFinderClient.sharedInstance()
-    var pin: Pin?
+    var pin: Pin? //the pin should be no nil now, was set by the MapViewController
     var array = [Photo]()
     var context : NSManagedObjectContext? = nil
     var dataIsDownloading: Bool = true
     var preliminaryPhotoArray = [Int]()
+    var numberOfNewCollection: Int = 1
+    
     
     @IBOutlet weak var mapView: MKMapView!
     @IBOutlet weak var collectionView: UICollectionView!
@@ -40,6 +42,20 @@ class CollectionViewController: UIViewController{
         mapView.addAnnotation(pin!.annotation)
         collectionView.delegate = self
         collectionView.dataSource = self
+        
+        
+        //check if there is any pictures stored for this pin
+        let fetchRequest = NSFetchRequest<NSFetchRequestResult>(entityName: "Photo")
+        let predicate = NSPredicate(format: "photoToPin = %@", argumentArray: [pin!])
+        fetchRequest.predicate = predicate
+        
+        do{
+            if let results = try context?.fetch(fetchRequest) as? [Photo]{
+                print("we do have results of photos we have \(results.count)")
+            }
+        }catch{
+            fatalError("can not get the photos form core data")
+        }
         
         //we get the pictures form the internet
         // we need the parameters to search near the annotation
