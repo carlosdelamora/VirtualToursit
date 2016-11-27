@@ -105,7 +105,7 @@ class FlickFinderClient:NSObject{
             print("the json data could not be obtained")
         }
         
-        print("here is the jsonData closureForTask \(jsonData)")
+        //print("here is the jsonData closureForTask \(jsonData)")
         return jsonData as? [String:AnyObject]
     }
 

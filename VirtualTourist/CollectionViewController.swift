@@ -19,6 +19,7 @@ class CollectionViewController: UIViewController{
     var array = [Photo]()
     var context : NSManagedObjectContext? = nil
     var dataIsDownloading: Bool = true
+    var firstDawnload: Bool = true
     var preliminaryPhotoArray = [Int]()
     var numberOfNewCollection: Int = 1
     
@@ -51,37 +52,46 @@ class CollectionViewController: UIViewController{
         
         do{
             if let results = try context?.fetch(fetchRequest) as? [Photo]{
-                print("we do have results of photos we have \(results.count)")
+                print("we have this number of photos \(results.count)")
+                array = results
             }
         }catch{
             fatalError("can not get the photos form core data")
         }
         
-        //we get the pictures form the internet
-        // we need the parameters to search near the annotation
-        let methodParameters = [
-            Constants.FlickrParameterKeys.Method: Constants.FlickrParameterValues.SearchMethod,
-            Constants.FlickrParameterKeys.APIKey: Constants.FlickrParameterValues.APIKey,
-            Constants.FlickrParameterKeys.BoundingBox: bboxString(pin!.annotation.coordinate.latitude, pin!.annotation.coordinate.longitude),
-            Constants.FlickrParameterKeys.SafeSearch: Constants.FlickrParameterValues.UseSafeSearch,
-            Constants.FlickrParameterKeys.Extras: Constants.FlickrParameterValues.MediumURL,
-            Constants.FlickrParameterKeys.Format: Constants.FlickrParameterValues.ResponseFormat,
-            Constants.FlickrParameterKeys.NoJSONCallback: Constants.FlickrParameterValues.DisableJSONCallback
-        ]
-        
-        print("flickerGetMethod should be called in the map view did select")
-        let method = client.flickURLFromParameters(methodParameters)
-        client.flickGetMethod(method){ jsonData, error in
-            self.closureForGetMethod(jsonData, error as NSError?)
+        if (array.count) > 0{
+            firstDawnload = false
+            dataIsDownloading = false
+            print("the array is \(array)")
+            
+        }else{
+            print("we do not have results")
+            //we get the pictures form the internet
+            // we need the parameters to search near the annotation
+            let methodParameters = [
+                Constants.FlickrParameterKeys.Method: Constants.FlickrParameterValues.SearchMethod,
+                Constants.FlickrParameterKeys.APIKey: Constants.FlickrParameterValues.APIKey,
+                Constants.FlickrParameterKeys.BoundingBox: bboxString(pin!.annotation.coordinate.latitude, pin!.annotation.coordinate.longitude),
+                Constants.FlickrParameterKeys.SafeSearch: Constants.FlickrParameterValues.UseSafeSearch,
+                Constants.FlickrParameterKeys.Extras: Constants.FlickrParameterValues.MediumURL,
+                Constants.FlickrParameterKeys.Format: Constants.FlickrParameterValues.ResponseFormat,
+                Constants.FlickrParameterKeys.NoJSONCallback: Constants.FlickrParameterValues.DisableJSONCallback
+            ]
+            
+            print("flickerGetMethod should be called in the map view did select")
+            let method = client.flickURLFromParameters(methodParameters)
+            client.flickGetMethod(method){ jsonData, error in
+                self.closureForGetMethod(jsonData, error as NSError?)
+            }
         }
     }
     
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(true)
-         print("the nomber of items in the array is \(array.count)")
-        performUIUpdatesOnMain {
+         print("the number of items in the array is \(array.count)")
+        /*performUIUpdatesOnMain {
             self.collectionView?.reloadData()
-        }
+        }*/
         
 
     }
@@ -158,10 +168,10 @@ class CollectionViewController: UIViewController{
              let noNullDataArray = dataArray.filter({$0 != nil})
              array = noNullDataArray.map({Photo($0!, pin!, context!)})
              dataIsDownloading = false
-              //Do we need to perform uptadets in main queue? it does not seem to block if is not there
-            performUIUpdatesOnMain {
+            
+             performUIUpdatesOnMain {
                 self.collectionView?.reloadData()
-            }
+             }
             
             
             print(" the number of photos in the arrayOfPhotos is \(array.count)")
@@ -176,20 +186,28 @@ class CollectionViewController: UIViewController{
 
 extension CollectionViewController: UICollectionViewDelegate, UICollectionViewDataSource {
     func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
-        return min(27, preliminaryPhotoArray.count)
+        let a = firstDawnload ? preliminaryPhotoArray.count : array.count 
+        print("numbersOfItemsInSection got called, the array has \(preliminaryPhotoArray.count)")
+        return min(27, a)
     }
     
     func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
         let cell = collectionView.dequeueReusableCell(withReuseIdentifier: "Cell", for: indexPath) as!
         CollectionCell
+        print("collectionView got called")
         if dataIsDownloading {
+            print("data is downloading")
             addActyIndicator(cell.imageView)
         }else{
+            print("we have pictures in the array")
             let photo = array[indexPath.row]
             let data = photo.imageData
             let image = UIImage(data: data as! Data)
             cell.imageView.image = image
-            removeActivityIndicator()
+            
+            if firstDawnload{
+                removeActivityIndicator()
+            }
         }
         return cell
     }
