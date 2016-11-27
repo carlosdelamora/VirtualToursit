@@ -23,11 +23,14 @@ class CollectionViewController: UIViewController{
     var preliminaryPhotoArray = [Int]()
     var numberOfNewCollection: Int = 1
     
-    
+    @IBOutlet weak var newCollectionView: UIView!
     @IBOutlet weak var mapView: MKMapView!
     @IBOutlet weak var collectionView: UICollectionView!
     
     override func viewDidLoad() {
+        
+        //It does not look exactly as the demo app, I do not know how to make the border line to go even thiner. If I change the value below 0.25 the border disappears 
+        self.newCollectionView.layer.borderWidth = 0.25
         
         // set the context
         let appDelegate = UIApplication.shared.delegate as! AppDelegate
@@ -95,6 +98,13 @@ class CollectionViewController: UIViewController{
         
 
     }
+    
+    
+    @IBAction func newCollectionButton(_ sender: Any) {
+        
+        //TODO set the code to get a new Collection.
+    }
+    
     
     private func bboxString(_ latitude: Double?, _ longitude: Double?) -> String {
         // ensure bbox is bounded by minimum and maximums
@@ -186,7 +196,7 @@ class CollectionViewController: UIViewController{
 
 extension CollectionViewController: UICollectionViewDelegate, UICollectionViewDataSource {
     func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
-        let a = firstDawnload ? preliminaryPhotoArray.count : array.count 
+        let a = firstDawnload ? preliminaryPhotoArray.count : array.count
         print("numbersOfItemsInSection got called, the array has \(preliminaryPhotoArray.count)")
         return min(27, a)
     }
@@ -205,6 +215,7 @@ extension CollectionViewController: UICollectionViewDelegate, UICollectionViewDa
             let image = UIImage(data: data as! Data)
             cell.imageView.image = image
             
+            //we should only call this when is the first download, then dataIsDownloading changes form true to false when it stops downloading we had added the activity indicator and now can be removed. If is not the first download then dataIsDownloading is always false an thus addActivityIndicator never gets called and thus no need to removeActivityIndicator otherwise will crash.
             if firstDawnload{
                 removeActivityIndicator()
             }
