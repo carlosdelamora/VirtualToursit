@@ -17,13 +17,13 @@ class CollectionViewController: UIViewController{
     var activityIndicator: UIActivityIndicatorView!
     let client = FlickFinderClient.sharedInstance()
     var pin: Pin? //the pin should be no nil now, was set by the MapViewController
-    var array = [Photo]()
+    var arrayOfPhotos = [Photo]()
     var context : NSManagedObjectContext? = nil
     var dataIsDownloading: Bool = true
     var firstDawnload: Bool = true
     var placeHolderNumber: Int = 0
     var numberOfNewCollection: Int = 1
-    var myDataArray = [Data]()
+    var myDataArray = [Data?]()
     var preDataArray = [[String: AnyObject]]()
     
     
@@ -60,16 +60,16 @@ class CollectionViewController: UIViewController{
         do{
             if let results = try context?.fetch(fetchRequest) as? [Photo]{
                 print("we have this number of photos in core data \(results.count)")
-                array = results
+                arrayOfPhotos = results
             }
         }catch{
             fatalError("can not get the photos form core data")
         }
         
-        if (array.count) > 0{
+        if (arrayOfPhotos.count) > 0{
             firstDawnload = false
             dataIsDownloading = false
-            print("the array is \(array)")
+            
             
         }else{
             print("since we do not have photos form core data we get photos online")
@@ -138,13 +138,13 @@ class CollectionViewController: UIViewController{
         return
         }
         
-        placeHolderNumber = min(total,27)
-        //placeHolderArray = (0...(placeHolderNumber - 1))
+        // we use this number to populate the table with activity inidcators
+        placeHolderNumber = min(total,21)
         performUIUpdatesOnMain {
             print("perform updates in main first ")
             self.collectionView?.reloadData()
         }
-
+        
         /* GUARD: Is the "photo" key in photosDictionary? */
         guard let photosDictionaryArray = photosDictionary[Constants.FlickrResponseKeys.Photo] as? [[String: AnyObject]] else {
         print("Cannot find key '\(Constants.FlickrResponseKeys.Photo)' in \(jsonData)")
@@ -156,32 +156,25 @@ class CollectionViewController: UIViewController{
             return
         }else {
             
-            preDataArray = photosDictionaryArray
+            //we create myData array with max of 21 pictures
+            myDataArray = photosDictionaryArray[0...placeHolderNumber-1].map({ getDataFromArray($0)})
             dataIsDownloading = false
             performUIUpdatesOnMain {
                 print("perform updates in main first ")
                 self.collectionView?.reloadData()
             }
+            //Instantiate the photos in myDataArray and save them to core Data
+            let _ = myDataArray.map({Photo($0!, pin!, context!)})
+            appDelegate.stack!.saves()
             
-            
-            
-            /*let dataArray = photosDictionaryArray.map({ getDataFromArray($0)})
-            
-             let noNullDataArray = dataArray.filter({$0 != nil})
-             myDataArray = noNullDataArray as! [Data]
-            
-            
-            
-             dataIsDownloading = false
-            
-             print(" the number of photos in the arrayOfPhotos is \(array.count)")
-            
-             performUIUpdatesOnMain {
-                self.collectionView?.reloadData()
-             }
-            
-             //array = noNullDataArray.map({Photo($0!, pin!, context!)})
-             appDelegate.stack!.saves()*/
+            //If we have more than 27 pictures downloaded we instantiate more photos to be saved in the core Data
+            if total > 21{
+                let extra = min(70,total)
+                let dataArray = photosDictionaryArray[placeHolderNumber...extra].map({ getDataFromArray($0)})
+                let noNullDataArray = dataArray.filter({$0 != nil}) as! [Data]
+                arrayOfPhotos = noNullDataArray.map({Photo($0, pin!, context!)})
+                appDelegate.stack!.saves()
+            }
         }
     }
 }
@@ -189,7 +182,7 @@ class CollectionViewController: UIViewController{
 
 extension CollectionViewController: UICollectionViewDelegate, UICollectionViewDataSource {
     func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
-        let a = firstDawnload ? placeHolderNumber : preDataArray.count
+        let a = firstDawnload ? placeHolderNumber : arrayOfPhotos.count
         
         print("numbersOfItemsInSection got called, the placeHolderNumber array has \(placeHolderNumber)")
         print("a=\(a) is it first download \(firstDawnload)")
@@ -200,25 +193,29 @@ extension CollectionViewController: UICollectionViewDelegate, UICollectionViewDa
         let cell = collectionView.dequeueReusableCell(withReuseIdentifier: "Cell", for: indexPath) as!
         CollectionCell
         print("collectionView got called")
-    
-        if dataIsDownloading {
-            print("data is downloading")
-            addActyIndicator(cell.imageView)
-        }else{
-            print("we have pictures in the array")
-            //let photo = array[indexPath.row]
-            //let data = photo.imageData
-            let data = getDataFromArray(preDataArray[indexPath.row])
-            guard let image = UIImage(data: data!) else{
-                return cell
+        
+        //if is the first download we use myDataArray which is an array that was recently downloaded
+        if firstDawnload{
+            //If data is downloading we place an acitvity indicator in the cell
+            if dataIsDownloading {
+                print("data is downloading")
+                addActyIndicator(cell.imageView)
+            }else{
+                //if the data is no longer donwloading we place an image cell in the array
+                print("we have pictures in the array")
+                
+                let data = myDataArray[indexPath.row]
+                guard let image = UIImage(data: data!) else{
+                    return cell
+                }
+                cell.imageView.image = image
             }
-            
+        }else{
+            //If this is not the first download then then we get and arrayOfPhotos from Core Data
+            let data = arrayOfPhotos[indexPath.row].imageData as! Data
+            let image = UIImage(data: data)
             cell.imageView.image = image
-            
-            //we should only call this when is the first download, then dataIsDownloading changes form true to false when it stops downloading we had added the activity indicator and now can be removed. If is not the first download then dataIsDownloading is always false an thus addActivityIndicator never gets called and thus no need to removeActivityIndicator otherwise will crash.
-            /*if firstDawnload{
-                removeActivityIndicator()
-            }*/
+
         }
         return cell
     }
