@@ -13,6 +13,7 @@ import CoreData
 
 class MapViweController: UIViewController{
     
+    
     let client = FlickFinderClient.sharedInstance()
     var editMode = false
     var annotations = [MKPointAnnotation]()

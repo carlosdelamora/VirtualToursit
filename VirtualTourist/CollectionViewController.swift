@@ -13,6 +13,7 @@ import CoreData
 
 class CollectionViewController: UIViewController{
     
+    let appDelegate = UIApplication.shared.delegate as! AppDelegate
     var activityIndicator: UIActivityIndicatorView!
     let client = FlickFinderClient.sharedInstance()
     var pin: Pin? //the pin should be no nil now, was set by the MapViewController
@@ -174,10 +175,14 @@ class CollectionViewController: UIViewController{
                  return imageData
              
              }
-             
-             let dataArray = photosDictionaryArray.map({ getDataFromArray($0)})
+            
+             let numberOfPhotos = photosDictionaryArray.count
+             // Instatiate the minumum amout of photos that you need in order to speed up the display of the pictures. Instatiate the rest of the pictures after the reload method of the collection view has been called.
+             let dataArray = photosDictionaryArray[0...min(numberOfPhotos-1, 27)].map({ getDataFromArray($0)})
+            
              let noNullDataArray = dataArray.filter({$0 != nil})
              array = noNullDataArray.map({Photo($0!, pin!, context!)})
+             appDelegate.stack!.saves()
              dataIsDownloading = false
             
              print(" the number of photos in the arrayOfPhotos is \(array.count)")
@@ -186,9 +191,10 @@ class CollectionViewController: UIViewController{
                 self.collectionView?.reloadData()
              }
             
-            
-            
-         
+            if photosDictionaryArray.count>27{
+                let _ = photosDictionaryArray[27...numberOfPhotos-1].map({ getDataFromArray($0)})
+                appDelegate.stack!.saves()
+            }
          }
      }
     
