@@ -30,7 +30,7 @@ class CollectionViewController: UIViewController{
     override func viewDidLoad() {
         
         //It does not look exactly as the demo app, I do not know how to make the border line to go even thiner. If I change the value below 0.25 the border disappears 
-        self.newCollectionView.layer.borderWidth = 0.25
+        self.newCollectionView.layer.borderWidth = 0.3
         
         // set the context
         let appDelegate = UIApplication.shared.delegate as! AppDelegate
@@ -83,6 +83,7 @@ class CollectionViewController: UIViewController{
             
             print("flickerGetMethod should be called in the map view did select")
             let method = client.flickURLFromParameters(methodParameters)
+            print("\(method)")
             client.flickGetMethod(method){ jsonData, error in
                 self.closureForGetMethod(jsonData, error as NSError?)
             }
@@ -174,17 +175,19 @@ class CollectionViewController: UIViewController{
              
              }
              
-             let dataArray = photosDictionaryArray[0...27].map({ getDataFromArray($0)})
+             let dataArray = photosDictionaryArray.map({ getDataFromArray($0)})
              let noNullDataArray = dataArray.filter({$0 != nil})
              array = noNullDataArray.map({Photo($0!, pin!, context!)})
              dataIsDownloading = false
+            
+             print(" the number of photos in the arrayOfPhotos is \(array.count)")
             
              performUIUpdatesOnMain {
                 self.collectionView?.reloadData()
              }
             
             
-            print(" the number of photos in the arrayOfPhotos is \(array.count)")
+            
          
          }
      }
@@ -197,7 +200,9 @@ class CollectionViewController: UIViewController{
 extension CollectionViewController: UICollectionViewDelegate, UICollectionViewDataSource {
     func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
         let a = firstDawnload ? preliminaryPhotoArray.count : array.count
-        print("numbersOfItemsInSection got called, the array has \(preliminaryPhotoArray.count)")
+        
+        print("numbersOfItemsInSection got called, the preliminaryPhotoArray has \(preliminaryPhotoArray.count) and array has \(array.count)")
+        print("a=\(a) is it first download \(firstDawnload)")
         return min(27, a)
     }
     
