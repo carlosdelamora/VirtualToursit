@@ -21,15 +21,18 @@ class CollectionViewController: UIViewController{
     var context : NSManagedObjectContext? = nil
     var dataIsDownloading: Bool = true
     var firstDawnload: Bool = true
-    var preliminaryPhotoArray = [Int]()
+    var placeHolderNumber: Int = 0
     var numberOfNewCollection: Int = 1
+    var myDataArray = [Data]()
+    var preDataArray = [[String: AnyObject]]()
+    
     
     @IBOutlet weak var newCollectionView: UIView!
     @IBOutlet weak var mapView: MKMapView!
     @IBOutlet weak var collectionView: UICollectionView!
     
     override func viewDidLoad() {
-        
+        print("view Did load got called")
         //It does not look exactly as the demo app, I do not know how to make the border line to go even thiner. If I change the value below 0.25 the border disappears 
         self.newCollectionView.layer.borderWidth = 0.3
         
@@ -56,7 +59,7 @@ class CollectionViewController: UIViewController{
         
         do{
             if let results = try context?.fetch(fetchRequest) as? [Photo]{
-                print("we have this number of photos \(results.count)")
+                print("we have this number of photos in core data \(results.count)")
                 array = results
             }
         }catch{
@@ -69,7 +72,7 @@ class CollectionViewController: UIViewController{
             print("the array is \(array)")
             
         }else{
-            print("we do not have results")
+            print("since we do not have photos form core data we get photos online")
             //we get the pictures form the internet
             // we need the parameters to search near the annotation
             let methodParameters = [
@@ -82,9 +85,7 @@ class CollectionViewController: UIViewController{
                 Constants.FlickrParameterKeys.NoJSONCallback: Constants.FlickrParameterValues.DisableJSONCallback
             ]
             
-            print("flickerGetMethod should be called in the map view did select")
             let method = client.flickURLFromParameters(methodParameters)
-            print("\(method)")
             client.flickGetMethod(method){ jsonData, error in
                 self.closureForGetMethod(jsonData, error as NSError?)
             }
@@ -93,12 +94,7 @@ class CollectionViewController: UIViewController{
     
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(true)
-         print("the number of items in the array is \(array.count)")
-        /*performUIUpdatesOnMain {
-            self.collectionView?.reloadData()
-        }*/
-        
-
+        print("view Will appear got called may be realod data is called first here")
     }
     
     
@@ -124,65 +120,58 @@ class CollectionViewController: UIViewController{
     
     func closureForGetMethod(_ jsonData:[String: AnyObject], _ error: NSError?){
      
-         guard (error == nil) else{
+        guard (error == nil) else{
              print("There was an error in closure ForGetMethod \(error)")
              return
-         }
-     
-         let controller = self.storyboard?.instantiateViewController(withIdentifier: "CollectionViewController") as! CollectionViewController
-     
-         // get the photos and instanciate them
-         /* GUARD: Is the "photos" key in our  jsonData */
-         guard let photosDictionary = jsonData[Constants.FlickrResponseKeys.Photos] as? [String:AnyObject] else {
+        }
+        
+        // get the photos and instanciate them
+        /* GUARD: Is the "photos" key in our  jsonData */
+        guard let photosDictionary = jsonData[Constants.FlickrResponseKeys.Photos] as? [String:AnyObject] else {
              print("Cannot find key '\(Constants.FlickrResponseKeys.Photos)' in \(jsonData)")
              return
-         }
+        }
+        
+        
+        guard let total = Int((photosDictionary[Constants.FlickrResponseKeys.Total] as? String)!) else{
+        print("there is not total in jsonData")
+        return
+        }
+        
+        placeHolderNumber = min(total,27)
+        //placeHolderArray = (0...(placeHolderNumber - 1))
+        performUIUpdatesOnMain {
+            print("perform updates in main first ")
+            self.collectionView?.reloadData()
+        }
+
+        /* GUARD: Is the "photo" key in photosDictionary? */
+        guard let photosDictionaryArray = photosDictionary[Constants.FlickrResponseKeys.Photo] as? [[String: AnyObject]] else {
+        print("Cannot find key '\(Constants.FlickrResponseKeys.Photo)' in \(jsonData)")
+        return
+        }
      
-         /* GUARD: Is the "photo" key in photosDictionary? */
-         guard let photosDictionaryArray = photosDictionary[Constants.FlickrResponseKeys.Photo] as? [[String: AnyObject]] else {
-         print("Cannot find key '\(Constants.FlickrResponseKeys.Photo)' in \(jsonData)")
-         return
-         }
-     
-         if photosDictionaryArray.count == 0 {
-             print("No Photos Found. Search Again.")
-             return
-         }else {
+        if photosDictionaryArray.count == 0 {
+            print("No Photos Found. Search Again.")
+            return
+        }else {
             
-            //we use preliminaryPhotoArray to know as soon as possible how many pictures are there and know how many cells with activity views to present.
-             preliminaryPhotoArray = (1...photosDictionaryArray.count).map({$0})
-             print("preliminary photo array \(preliminaryPhotoArray.count) while photoDictionary has \(photosDictionaryArray.count)")
-            
-             performUIUpdatesOnMain {
+            preDataArray = photosDictionaryArray
+            dataIsDownloading = false
+            performUIUpdatesOnMain {
+                print("perform updates in main first ")
                 self.collectionView?.reloadData()
-             }
+            }
             
-             func getDataFromArray(_ photoDictionary: [String: AnyObject]) -> Data?{
-                 guard let imageUrlString = photoDictionary[Constants.FlickrResponseKeys.MediumURL] as? String else{
-                 print("the imageURLstring was not cast as a string we return nil for the data")
-                 return nil
-                 }
-         
-                 guard let url = URL(string: imageUrlString) else{
-                     print("the url was not cast as a string we return nil for the data")
-                     return nil
-                 }
-                 
-                 guard let imageData = try? Data(contentsOf: url)else{
-                     return nil
-                 }
-                 
-                 return imageData
-             
-             }
             
-             let numberOfPhotos = photosDictionaryArray.count
-             // Instatiate the minumum amout of photos that you need in order to speed up the display of the pictures. Instatiate the rest of the pictures after the reload method of the collection view has been called.
-             let dataArray = photosDictionaryArray[0...min(numberOfPhotos-1, 27)].map({ getDataFromArray($0)})
+            
+            /*let dataArray = photosDictionaryArray.map({ getDataFromArray($0)})
             
              let noNullDataArray = dataArray.filter({$0 != nil})
-             array = noNullDataArray.map({Photo($0!, pin!, context!)})
-             appDelegate.stack!.saves()
+             myDataArray = noNullDataArray as! [Data]
+            
+            
+            
              dataIsDownloading = false
             
              print(" the number of photos in the arrayOfPhotos is \(array.count)")
@@ -191,48 +180,68 @@ class CollectionViewController: UIViewController{
                 self.collectionView?.reloadData()
              }
             
-            if photosDictionaryArray.count>27{
-                let _ = photosDictionaryArray[27...numberOfPhotos-1].map({ getDataFromArray($0)})
-                appDelegate.stack!.saves()
-            }
-         }
-     }
-    
-    
-    
+             //array = noNullDataArray.map({Photo($0!, pin!, context!)})
+             appDelegate.stack!.saves()*/
+        }
+    }
 }
 
 
 extension CollectionViewController: UICollectionViewDelegate, UICollectionViewDataSource {
     func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
-        let a = firstDawnload ? preliminaryPhotoArray.count : array.count
+        let a = firstDawnload ? placeHolderNumber : preDataArray.count
         
-        print("numbersOfItemsInSection got called, the preliminaryPhotoArray has \(preliminaryPhotoArray.count) and array has \(array.count)")
+        print("numbersOfItemsInSection got called, the placeHolderNumber array has \(placeHolderNumber)")
         print("a=\(a) is it first download \(firstDawnload)")
-        return min(27, a)
+        return min(21, a)
     }
     
     func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
         let cell = collectionView.dequeueReusableCell(withReuseIdentifier: "Cell", for: indexPath) as!
         CollectionCell
         print("collectionView got called")
+    
         if dataIsDownloading {
             print("data is downloading")
             addActyIndicator(cell.imageView)
         }else{
             print("we have pictures in the array")
-            let photo = array[indexPath.row]
-            let data = photo.imageData
-            let image = UIImage(data: data as! Data)
+            //let photo = array[indexPath.row]
+            //let data = photo.imageData
+            let data = getDataFromArray(preDataArray[indexPath.row])
+            guard let image = UIImage(data: data!) else{
+                return cell
+            }
+            
             cell.imageView.image = image
             
             //we should only call this when is the first download, then dataIsDownloading changes form true to false when it stops downloading we had added the activity indicator and now can be removed. If is not the first download then dataIsDownloading is always false an thus addActivityIndicator never gets called and thus no need to removeActivityIndicator otherwise will crash.
-            if firstDawnload{
+            /*if firstDawnload{
                 removeActivityIndicator()
-            }
+            }*/
         }
         return cell
     }
+    
+    func getDataFromArray(_ photoDictionary: [String: AnyObject]) -> Data?{
+        guard let imageUrlString = photoDictionary[Constants.FlickrResponseKeys.MediumURL] as? String else{
+            print("the imageURLstring was not cast as a string we return nil for the data")
+            return nil
+        }
+        
+        guard let url = URL(string: imageUrlString) else{
+            print("the url was not cast as a string we return nil for the data")
+            return nil
+        }
+        
+        guard let imageData = try? Data(contentsOf: url)else{
+            return nil
+        }
+        
+        return imageData
+        
+    }
+
     
     func addActyIndicator( _ cellView: UIImageView){
         activityIndicator = UIActivityIndicatorView( frame: cellView.bounds)
