@@ -22,10 +22,9 @@ class CollectionViewController: UIViewController{
     var dataIsDownloading: Bool = true
     var firstDawnload: Bool = true
     var placeHolderNumber: Int = 0
-    var numberOfNewCollection: Int = 1
     var myDataArray = [Data?]()
     var preDataArray = [[String: AnyObject]]()
-    
+    var viewWillDisapear: Bool = false
     
     @IBOutlet weak var newCollectionButton: UIButton!
     @IBOutlet weak var newCollectionView: UIView!
@@ -101,6 +100,10 @@ class CollectionViewController: UIViewController{
         print("view Will appear got called may be realod data is called first here")
     }
     
+    override func viewWillDisappear(_ animated: Bool) {
+        super.viewWillDisappear(true)
+        viewWillDisapear = true 
+    }
     
     @IBAction func newCollectionButton(_ sender: Any) {
         
@@ -189,9 +192,13 @@ class CollectionViewController: UIViewController{
             guard let aPin = aPin else {
                 return photoArray
             }
+            if viewWillDisapear{
+                return photoArray
+            }
             let photo = Photo(data, aPin, context!)
             photoArray.append(photo)
         }
+        
         return photoArray
     }
     
