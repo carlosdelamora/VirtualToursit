@@ -194,6 +194,7 @@
                     <connections>
                         <outlet property="collectionView" destination="kZK-wE-RqB" id="MWg-2B-qgp"/>
                         <outlet property="mapView" destination="dtS-fX-I5U" id="iSZ-OQ-bTQ"/>
+                        <outlet property="newCollectionButton" destination="zzt-Or-hwy" id="zOY-tg-CBY"/>
                         <outlet property="newCollectionView" destination="1eC-sd-NUz" id="rIy-uP-xHt"/>
                     </connections>
                 </viewController>

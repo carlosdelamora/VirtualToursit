@@ -27,12 +27,15 @@ class CollectionViewController: UIViewController{
     var preDataArray = [[String: AnyObject]]()
     
     
+    @IBOutlet weak var newCollectionButton: UIButton!
     @IBOutlet weak var newCollectionView: UIView!
     @IBOutlet weak var mapView: MKMapView!
     @IBOutlet weak var collectionView: UICollectionView!
     
     override func viewDidLoad() {
         print("view Did load got called")
+        newCollectionButton.isEnabled = false
+        newCollectionView.alpha = 0.25
         //It does not look exactly as the demo app, I do not know how to make the border line to go even thiner. If I change the value below 0.25 the border disappears 
         self.newCollectionView.layer.borderWidth = 0.3
         
@@ -69,7 +72,8 @@ class CollectionViewController: UIViewController{
         if (arrayOfPhotos.count) > 0{
             firstDawnload = false
             dataIsDownloading = false
-            
+            self.newCollectionButton.isEnabled = true
+            self.newCollectionView.alpha = 1
             
         }else{
             print("since we do not have photos form core data we get photos online")
@@ -101,6 +105,7 @@ class CollectionViewController: UIViewController{
     @IBAction func newCollectionButton(_ sender: Any) {
         
         //TODO set the code to get a new Collection.
+        print("the button is enabled")
     }
     
     
@@ -162,10 +167,12 @@ class CollectionViewController: UIViewController{
             performUIUpdatesOnMain {
                 print("perform updates in main first ")
                 self.collectionView?.reloadData()
+                self.newCollectionButton.isEnabled = true
+                self.newCollectionView.alpha = 1
             }
             //Instantiate the photos in myDataArray and save them to core Data
             let _ = myDataArray.map({Photo($0!, pin!, context!)})
-            appDelegate.stack!.saves()
+
             
             //If we have more than 27 pictures downloaded we instantiate more photos to be saved in the core Data
             if total > 21{
@@ -173,7 +180,6 @@ class CollectionViewController: UIViewController{
                 let dataArray = photosDictionaryArray[placeHolderNumber...extra].map({ getDataFromArray($0)})
                 let noNullDataArray = dataArray.filter({$0 != nil}) as! [Data]
                 arrayOfPhotos = noNullDataArray.map({Photo($0, pin!, context!)})
-                appDelegate.stack!.saves()
             }
         }
     }
@@ -231,7 +237,7 @@ extension CollectionViewController: UICollectionViewDelegate, UICollectionViewDa
             return nil
         }
         
-        guard let imageData = try? Data(contentsOf: url)else{
+        guard let imageData = try? Data(contentsOf: url) else{
             return nil
         }
         
