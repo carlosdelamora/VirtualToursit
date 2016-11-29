@@ -13,7 +13,7 @@ import CoreData
 
 class MapViweController: UIViewController{
     
-    
+    let delegate = UIApplication.shared.delegate as! AppDelegate
     let client = FlickFinderClient.sharedInstance()
     var editMode = false
     var annotations = [MKPointAnnotation]()
@@ -131,13 +131,8 @@ class MapViweController: UIViewController{
             //create Pin to save it into core Data
             let pin = Pin(latitude: annotation.coordinate.latitude, longitude: annotation.coordinate.longitude, context: context!)
             print("the new pin deropded has coordinates\(pin.annotation.coordinate)")
-        }
-        
+        }        
     }
-    
-    
-    
-    
 }
 
 extension MapViweController: MKMapViewDelegate{
@@ -181,18 +176,25 @@ extension MapViweController: MKMapViewDelegate{
     //we use this delegate function to respond to taps on the pins
     func mapView(_ mapView: MKMapView, didSelect view: MKAnnotationView) {
         
-        let pinSelected = pinFromAnnotation(view.annotation as! MKPointAnnotation)
         
         
         if editMode{
             
+            mapView.removeAnnotation(view.annotation!)
+            
+            let stack = delegate.stack
+            let pinSelected = pinFromAnnotation(view.annotation as! MKPointAnnotation)
+            
             if let pinToRemove = pinSelected {
                 context?.delete(pinToRemove)
-                print("the pin was removed")
+                stack?.saves()
+                print("the pin was removed in editMode \(editMode)")
+            }else{
+                print("we did not find the a pin")
             }
             
             //we want to delete the pin
-            mapView.removeAnnotation(view.annotation!)
+            
             
         }else{
             

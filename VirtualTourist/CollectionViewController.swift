@@ -136,8 +136,7 @@ class CollectionViewController: UIViewController{
              print("Cannot find key '\(Constants.FlickrResponseKeys.Photos)' in \(jsonData)")
              return
         }
-        
-        
+
         guard let total = Int((photosDictionary[Constants.FlickrResponseKeys.Total] as? String)!) else{
         print("there is not total in jsonData")
         return
@@ -177,7 +176,7 @@ class CollectionViewController: UIViewController{
             //If we have more than 27 pictures downloaded we instantiate more photos to be saved in the core Data
             if total > 21{
                 let extra = min(70,total)
-                let dataArray = photosDictionaryArray[placeHolderNumber...extra].map({ getDataFromArray($0)})
+                let dataArray = photosDictionaryArray[placeHolderNumber...extra-1].map({ getDataFromArray($0)})
                 let noNullDataArray = dataArray.filter({$0 != nil}) as! [Data]
                 arrayOfPhotos = noNullDataArray.map({Photo($0, pin!, context!)})
             }
@@ -221,7 +220,6 @@ extension CollectionViewController: UICollectionViewDelegate, UICollectionViewDa
             let data = arrayOfPhotos[indexPath.row].imageData as! Data
             let image = UIImage(data: data)
             cell.imageView.image = image
-
         }
         return cell
     }
@@ -242,7 +240,6 @@ extension CollectionViewController: UICollectionViewDelegate, UICollectionViewDa
         }
         
         return imageData
-        
     }
 
     
@@ -253,10 +250,6 @@ extension CollectionViewController: UICollectionViewDelegate, UICollectionViewDa
         activityIndicator.startAnimating()
         cellView.addSubview(activityIndicator)
     }
-    
-    func removeActivityIndicator(){
-        activityIndicator.removeFromSuperview()
-    }
-    
+
 }
 
