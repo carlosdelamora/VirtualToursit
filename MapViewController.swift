@@ -179,11 +179,11 @@ extension MapViweController: MKMapViewDelegate{
         
         
         if editMode{
-            
+            let pinSelected = pinFromAnnotation(view.annotation as! MKPointAnnotation)
             mapView.removeAnnotation(view.annotation!)
             
             let stack = delegate.stack
-            let pinSelected = pinFromAnnotation(view.annotation as! MKPointAnnotation)
+            
             
             if let pinToRemove = pinSelected {
                 context?.delete(pinToRemove)
