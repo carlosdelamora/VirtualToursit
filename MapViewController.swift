@@ -179,19 +179,19 @@ extension MapViweController: MKMapViewDelegate{
         
         
         if editMode{
-            
-            mapView.removeAnnotation(view.annotation!)
+            performUIUpdatesOnMain {
+                let pinSelected = self.pinFromAnnotation(view.annotation as! MKPointAnnotation)
+                if let pinToRemove = pinSelected {
+                    self.context?.delete(pinToRemove)
+                    print("the pin was removed in editMode \(self.editMode)")
+                }else{
+                    print("we did not find the a pin")
+                }
+                mapView.removeAnnotation(view.annotation!)
+            }
             
             let stack = delegate.stack
-            let pinSelected = pinFromAnnotation(view.annotation as! MKPointAnnotation)
             
-            if let pinToRemove = pinSelected {
-                context?.delete(pinToRemove)
-                stack?.saves()
-                print("the pin was removed in editMode \(editMode)")
-            }else{
-                print("we did not find the a pin")
-            }
             
             //we want to delete the pin
             
