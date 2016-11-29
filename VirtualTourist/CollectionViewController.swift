@@ -22,10 +22,9 @@ class CollectionViewController: UIViewController{
     var dataIsDownloading: Bool = true
     var firstDawnload: Bool = true
     var placeHolderNumber: Int = 0
-    var numberOfNewCollection: Int = 1
     var myDataArray = [Data?]()
     var preDataArray = [[String: AnyObject]]()
-    
+    var viewWillDisapear: Bool = false
     
     @IBOutlet weak var newCollectionButton: UIButton!
     @IBOutlet weak var newCollectionView: UIView!
@@ -101,6 +100,10 @@ class CollectionViewController: UIViewController{
         print("view Will appear got called may be realod data is called first here")
     }
     
+    override func viewWillDisappear(_ animated: Bool) {
+        super.viewWillDisappear(true)
+        viewWillDisapear = true 
+    }
     
     @IBAction func newCollectionButton(_ sender: Any) {
         
@@ -170,7 +173,7 @@ class CollectionViewController: UIViewController{
                 self.newCollectionView.alpha = 1
             }
             //Instantiate the photos in myDataArray and save them to core Data
-            let _ = myDataArray.map({Photo($0!, pin!, context!)})
+            let _ = createPhoto(myDataArray as! [Data], pin)//.map({Photo($0!, pin!, context!)})
 
             
             //If we have more than 27 pictures downloaded we instantiate more photos to be saved in the core Data
@@ -178,10 +181,27 @@ class CollectionViewController: UIViewController{
                 let extra = min(70,total)
                 let dataArray = photosDictionaryArray[placeHolderNumber...extra-1].map({ getDataFromArray($0)})
                 let noNullDataArray = dataArray.filter({$0 != nil}) as! [Data]
-                arrayOfPhotos = noNullDataArray.map({Photo($0, pin!, context!)})
+                arrayOfPhotos = createPhoto(noNullDataArray, pin)//noNullDataArray.map({Photo($0, pin!, context!)})
             }
         }
     }
+    
+    func createPhoto(_ dataArray: [Data], _ aPin: Pin? )-> [Photo]{
+        var photoArray = [Photo]()
+        for data in dataArray {
+            guard let aPin = aPin else {
+                return photoArray
+            }
+            if viewWillDisapear{
+                return photoArray
+            }
+            let photo = Photo(data, aPin, context!)
+            photoArray.append(photo)
+        }
+        
+        return photoArray
+    }
+    
 }
 
 
