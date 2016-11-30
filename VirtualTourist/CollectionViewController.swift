@@ -25,7 +25,7 @@ class CollectionViewController: UIViewController{
     var myDataArray = [Data?]()
     var preDataArray = [[String: AnyObject]]()
     var viewWillDisapear: Bool = false
-    var collectionNumber = 0
+    
     
     @IBOutlet weak var newCollectionButton: UIButton!
     @IBOutlet weak var newCollectionView: UIView!
@@ -76,7 +76,6 @@ class CollectionViewController: UIViewController{
             self.newCollectionView.alpha = 1
             
         }else{
-            collectionNumber = 0
             print("since we do not have photos form core data we get photos online")
             //we get the pictures form the internet
             // we need the parameters to search near the annotation
