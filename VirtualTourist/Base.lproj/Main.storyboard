@@ -103,6 +103,20 @@
                         <rect key="frame" x="0.0" y="0.0" width="375" height="667"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <subviews>
+                            <view contentMode="scaleToFill" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="bSG-9F-1g3" userLabel="NoPhotosView">
+                                <rect key="frame" x="0.0" y="170" width="375" height="439"/>
+                                <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+                                <subviews>
+                                    <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" fixedFrame="YES" text="This pin has no images " textAlignment="center" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="NlW-u9-aHj" userLabel="This pin has no images">
+                                        <rect key="frame" x="8" y="101" width="359" height="88"/>
+                                        <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+                                        <color key="tintColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
+                                        <fontDescription key="fontDescription" type="system" pointSize="23"/>
+                                        <color key="textColor" red="1" green="0.074743433489999997" blue="0.0" alpha="1" colorSpace="calibratedRGB"/>
+                                        <nil key="highlightedColor"/>
+                                    </label>
+                                </subviews>
+                            </view>
                             <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="1eC-sd-NUz" userLabel="NewCollectionView">
                                 <rect key="frame" x="0.0" y="617" width="375" height="50"/>
                                 <subviews>
@@ -192,10 +206,12 @@
                         </constraints>
                     </view>
                     <connections>
+                        <outlet property="NoPhotosView" destination="bSG-9F-1g3" id="QNW-5P-lZ4"/>
                         <outlet property="collectionView" destination="kZK-wE-RqB" id="MWg-2B-qgp"/>
                         <outlet property="mapView" destination="dtS-fX-I5U" id="iSZ-OQ-bTQ"/>
                         <outlet property="newCollectionButton" destination="zzt-Or-hwy" id="zOY-tg-CBY"/>
                         <outlet property="newCollectionView" destination="1eC-sd-NUz" id="rIy-uP-xHt"/>
+                        <outlet property="noImagesLabel" destination="NlW-u9-aHj" id="mnn-1b-0If"/>
                     </connections>
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="3Ky-ix-psg" userLabel="First Responder" sceneMemberID="firstResponder"/>

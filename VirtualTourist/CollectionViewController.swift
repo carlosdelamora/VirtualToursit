@@ -27,13 +27,16 @@ class CollectionViewController: UIViewController{
     var viewWillDisapear: Bool = false
     
     
+    @IBOutlet weak var noImagesLabel: UILabel!
+    @IBOutlet weak var NoPhotosView: UIView!
     @IBOutlet weak var newCollectionButton: UIButton!
     @IBOutlet weak var newCollectionView: UIView!
     @IBOutlet weak var mapView: MKMapView!
     @IBOutlet weak var collectionView: UICollectionView!
     
     override func viewDidLoad() {
-        print("view Did load got called")
+        collectionView.isHidden = false
+        NoPhotosView.isHidden = true
         newCollectionButton.isEnabled = false
         newCollectionView.alpha = 0.25
         //It does not look exactly as the demo app, I do not know how to make the border line to go even thiner. If I change the value below 0.25 the border disappears 
@@ -171,8 +174,12 @@ class CollectionViewController: UIViewController{
         }
         
         if photosDictionaryArray.count == 0 {
-            print("No Photos Found. Search Again.")
-            return
+            print("this pin has no images should appear")
+            performUIUpdatesOnMain {
+                self.collectionView.isHidden = true
+                self.NoPhotosView.isHidden = false
+                self.noImagesLabel.text = "This pin has no images"
+            }
         }else {
             
             //we create myData array with max of 21 pictures
