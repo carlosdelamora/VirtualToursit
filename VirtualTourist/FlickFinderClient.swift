@@ -40,6 +40,7 @@ class FlickFinderClient:NSObject{
     
     func flickGetMethod(_ methodURL: URL, _ completionHandeler: @escaping ([String: AnyObject], Error?)-> Void){
         print("flickerGetMethod was called")
+        print("method \(methodURL)")
         let session = URLSession.shared
         let request = URLRequest(url: methodURL)
         // create network request

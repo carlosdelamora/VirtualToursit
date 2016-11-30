@@ -25,6 +25,7 @@ class CollectionViewController: UIViewController{
     var myDataArray = [Data?]()
     var preDataArray = [[String: AnyObject]]()
     var viewWillDisapear: Bool = false
+    var collectionNumber = 0
     
     @IBOutlet weak var newCollectionButton: UIButton!
     @IBOutlet weak var newCollectionView: UIView!
@@ -75,6 +76,7 @@ class CollectionViewController: UIViewController{
             self.newCollectionView.alpha = 1
             
         }else{
+            collectionNumber = 0
             print("since we do not have photos form core data we get photos online")
             //we get the pictures form the internet
             // we need the parameters to search near the annotation
@@ -85,7 +87,8 @@ class CollectionViewController: UIViewController{
                 Constants.FlickrParameterKeys.SafeSearch: Constants.FlickrParameterValues.UseSafeSearch,
                 Constants.FlickrParameterKeys.Extras: Constants.FlickrParameterValues.MediumURL,
                 Constants.FlickrParameterKeys.Format: Constants.FlickrParameterValues.ResponseFormat,
-                Constants.FlickrParameterKeys.NoJSONCallback: Constants.FlickrParameterValues.DisableJSONCallback
+                Constants.FlickrParameterKeys.NoJSONCallback: Constants.FlickrParameterValues.DisableJSONCallback,
+                Constants.FlickrParameterKeys.PerPage: "70"
             ]
             
             let method = client.flickURLFromParameters(methodParameters)
@@ -106,8 +109,16 @@ class CollectionViewController: UIViewController{
     }
     
     @IBAction func newCollectionButton(_ sender: Any) {
-        
+        print("new collection got called")
         //TODO set the code to get a new Collection.
+        firstDawnload = false
+        let numberOfPhotos = arrayOfPhotos.count
+        if 21 < numberOfPhotos{
+            arrayOfPhotos = Array(arrayOfPhotos[21...numberOfPhotos-1])
+        }else{
+            arrayOfPhotos = [Photo]()
+        }
+        collectionView.reloadData()
         print("the button is enabled")
     }
     
@@ -135,7 +146,7 @@ class CollectionViewController: UIViewController{
         
         // get the photos and instanciate them
         /* GUARD: Is the "photos" key in our  jsonData */
-        guard let photosDictionary = jsonData[Constants.FlickrResponseKeys.Photos] as? [String:AnyObject] else {
+        guard let photosDictionary = jsonData[Constants.FlickrResponseKeys.Photos] as? [String: AnyObject] else {
              print("Cannot find key '\(Constants.FlickrResponseKeys.Photos)' in \(jsonData)")
              return
         }
@@ -145,10 +156,12 @@ class CollectionViewController: UIViewController{
         return
         }
         
+        
         // we use this number to populate the table with activity inidcators
         placeHolderNumber = min(total,21)
+       
+        print("perform updates in the collection Data ")
         performUIUpdatesOnMain {
-            print("perform updates in main first ")
             self.collectionView?.reloadData()
         }
         
@@ -157,7 +170,7 @@ class CollectionViewController: UIViewController{
         print("Cannot find key '\(Constants.FlickrResponseKeys.Photo)' in \(jsonData)")
         return
         }
-     
+        
         if photosDictionaryArray.count == 0 {
             print("No Photos Found. Search Again.")
             return
@@ -166,17 +179,20 @@ class CollectionViewController: UIViewController{
             //we create myData array with max of 21 pictures
             myDataArray = photosDictionaryArray[0...placeHolderNumber-1].map({ getDataFromArray($0)})
             dataIsDownloading = false
+        
+            print("we reload data")
             performUIUpdatesOnMain {
-                print("perform updates in main first ")
                 self.collectionView?.reloadData()
                 self.newCollectionButton.isEnabled = true
                 self.newCollectionView.alpha = 1
             }
+            
+            
             //Instantiate the photos in myDataArray and save them to core Data
             let _ = createPhoto(myDataArray as! [Data], pin)//.map({Photo($0!, pin!, context!)})
 
             
-            //If we have more than 27 pictures downloaded we instantiate more photos to be saved in the core Data
+            //If we have more than 21 pictures downloaded we instantiate more photos to be saved in the core Data
             if total > 21{
                 let extra = min(70,total)
                 let dataArray = photosDictionaryArray[placeHolderNumber...extra-1].map({ getDataFromArray($0)})
@@ -209,7 +225,7 @@ extension CollectionViewController: UICollectionViewDelegate, UICollectionViewDa
     func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
         let a = firstDawnload ? placeHolderNumber : arrayOfPhotos.count
         
-        print("numbersOfItemsInSection got called, the placeHolderNumber array has \(placeHolderNumber)")
+        print("numbersOfItemsInSection got called, the placeHolderNumber array has \(placeHolderNumber) arrayOfPhotos has \(arrayOfPhotos.count) photos")
         print("a=\(a) is it first download \(firstDawnload)")
         return min(21, a)
     }

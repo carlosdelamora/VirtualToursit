@@ -49,6 +49,17 @@ class MapViweController: UIViewController{
         let stack = appDelegate.stack
         context = stack?.context
         
+        //we get the current array of pins from core Data
+        let fetchRequest = NSFetchRequest<NSFetchRequestResult>(entityName: "Pin")
+        do{
+            if let results = try context?.fetch(fetchRequest) as? [Pin]{
+                pins = results
+            }
+        }catch{
+            fatalError("can not obtain the Pins")
+        }
+        
+        
         }
     
     override func viewWillAppear(_ animated: Bool) {
@@ -128,8 +139,9 @@ class MapViweController: UIViewController{
             annotations.append(annotation)
             mapView.addAnnotation(annotation)
             print("pin droped in \(annotation.coordinate)")
-            //create Pin to save it into core Data
+            //create Pin to save it into core Data append it to the array pins
             let pin = Pin(latitude: annotation.coordinate.latitude, longitude: annotation.coordinate.longitude, context: context!)
+            pins.append(pin)
             print("the new pin deropded has coordinates\(pin.annotation.coordinate)")
         }        
     }
@@ -156,16 +168,6 @@ extension MapViweController: MKMapViewDelegate{
     
     func pinFromAnnotation(_ annotation: MKAnnotation)-> Pin?{
         
-        //we get the current array of pins
-        let fetchRequest = NSFetchRequest<NSFetchRequestResult>(entityName: "Pin")
-        do{
-            if let results = try context?.fetch(fetchRequest) as? [Pin]{
-                pins = results
-            }
-        }catch{
-            fatalError("can not obtain the Pins")
-        }
-        
         //we now check wich pins have the same annotation thant the one that was errased
         let pinSelected = pins.filter({ $0.annotation.coordinate.latitude ==
             annotation.coordinate.latitude && $0.annotation.coordinate.longitude == annotation.coordinate.longitude}).first
@@ -179,14 +181,15 @@ extension MapViweController: MKMapViewDelegate{
         
         
         if editMode{
+            
+            let pinSelected = self.pinFromAnnotation(view.annotation as! MKPointAnnotation)
+            if let pinToRemove = pinSelected {
+                self.context?.delete(pinToRemove)
+            }else{
+                print("we did not find the a pin")
+            }
             performUIUpdatesOnMain {
-                let pinSelected = self.pinFromAnnotation(view.annotation as! MKPointAnnotation)
-                if let pinToRemove = pinSelected {
-                    self.context?.delete(pinToRemove)
-                }else{
-                    print("we did not find the a pin")
-                }
-                mapView.removeAnnotation(view.annotation!)
+                self.mapView.removeAnnotation(view.annotation!)
             }
 
             
@@ -202,7 +205,7 @@ extension MapViweController: MKMapViewDelegate{
 
             //set the pin in the controller
             controller.pin = thePin
-
+            
             self.navigationController?.pushViewController(controller, animated: true)
             
             //set the button with the right title and font
