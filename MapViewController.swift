@@ -59,6 +59,22 @@ class MapViweController: UIViewController{
             fatalError("can not obtain the Pins")
         }
         
+        //populate the map
+        let fetchRequests = NSFetchRequest<NSFetchRequestResult>(entityName: "Pin")
+        do{
+            if let results = try context?.fetch(fetchRequests) as? [Pin]{
+                pins = results
+            }
+        }catch{
+            fatalError("can not obtain the Pins")
+        }
+        
+        annotations = pins.map({$0.annotation})
+        print("we have this number of annotations \(annotations.count)")
+        //mapView.addAnnotation(annotations.first!)
+        
+        mapView.addAnnotations(annotations)
+
         
         }
     
@@ -77,22 +93,9 @@ class MapViweController: UIViewController{
             print(mapView.region.span.latitudeDelta)
         }
         
-        //populate the map
-        let fetchRequest = NSFetchRequest<NSFetchRequestResult>(entityName: "Pin")
-        do{
-            if let results = try context?.fetch(fetchRequest) as? [Pin]{
-                pins = results
-            }
-        }catch{
-            fatalError("can not obtain the Pins")
-        }
+        let selectedAnnotation = mapView.selectedAnnotations.first
         
-        annotations = pins.map({$0.annotation})
-        print("we have this number of annotations \(annotations.count)")
-        //mapView.addAnnotation(annotations.first!)
-       
-        mapView.addAnnotations(annotations)
-        
+        mapView.deselectAnnotation(selectedAnnotation, animated: true)
     }
 
     
@@ -178,7 +181,7 @@ extension MapViweController: MKMapViewDelegate{
     //we use this delegate function to respond to taps on the pins
     func mapView(_ mapView: MKMapView, didSelect view: MKAnnotationView) {
         
-        
+        print("we did select the pin")
         
         if editMode{
             
