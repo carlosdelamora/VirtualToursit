@@ -178,8 +178,17 @@ class CollectionViewController: UIViewController{
             
             //we create myData array with max of 21 pictures
             myDataArray = photosDictionaryArray[0...placeHolderNumber-1].map({ getDataFromArray($0)})
+            //Instantiate the photos in myDataArray and save them to core Data
+            let _ = createPhoto(myDataArray as! [Data], pin)
+            //If we have more than 21 pictures downloaded we instantiate more photos to be saved in the core Data
+            if total > 21{
+                let extra = min(70,total)
+                let dataArray = photosDictionaryArray[placeHolderNumber...extra-1].map({ getDataFromArray($0)})
+                let noNullDataArray = dataArray.filter({$0 != nil}) as! [Data]
+                arrayOfPhotos = createPhoto(noNullDataArray, pin)//noNullDataArray.map({Photo($0, pin!, context!)})
+            }
+
             dataIsDownloading = false
-        
             print("we reload data")
             performUIUpdatesOnMain {
                 self.collectionView?.reloadData()
@@ -188,17 +197,8 @@ class CollectionViewController: UIViewController{
             }
             
             
-            //Instantiate the photos in myDataArray and save them to core Data
-            let _ = createPhoto(myDataArray as! [Data], pin)//.map({Photo($0!, pin!, context!)})
-
             
-            //If we have more than 21 pictures downloaded we instantiate more photos to be saved in the core Data
-            if total > 21{
-                let extra = min(70,total)
-                let dataArray = photosDictionaryArray[placeHolderNumber...extra-1].map({ getDataFromArray($0)})
-                let noNullDataArray = dataArray.filter({$0 != nil}) as! [Data]
-                arrayOfPhotos = createPhoto(noNullDataArray, pin)//noNullDataArray.map({Photo($0, pin!, context!)})
-            }
+            
         }
     }
     
@@ -240,22 +240,33 @@ extension CollectionViewController: UICollectionViewDelegate, UICollectionViewDa
             //If data is downloading we place an acitvity indicator in the cell
             if dataIsDownloading {
                 print("data is downloading")
-                addActyIndicator(cell.imageView)
+                performUIUpdatesOnMain {
+                    self.addActyIndicator(cell.imageView)
+                }
+                
             }else{
                 //if the data is no longer donwloading we place an image cell in the array
                 print("we have pictures in the array")
                 
                 let data = myDataArray[indexPath.row]
-                guard let image = UIImage(data: data!) else{
-                    return cell
+                performUIUpdatesOnMain {
+                    guard let image = UIImage(data: data!) else{
+                        return 
+                    }
+                
+                    cell.imageView.image = image
                 }
-                cell.imageView.image = image
+                
+                
+                
             }
         }else{
             //If this is not the first download then then we get and arrayOfPhotos from Core Data
             let data = arrayOfPhotos[indexPath.row].imageData as! Data
             let image = UIImage(data: data)
-            cell.imageView.image = image
+            performUIUpdatesOnMain {
+                cell.imageView.image = image
+            }
         }
         return cell
     }
