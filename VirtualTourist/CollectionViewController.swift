@@ -117,6 +117,16 @@ class CollectionViewController: UIViewController{
         viewWillDisapear = true 
     }
     
+    override func viewWillTransition(to size: CGSize, with coordinator: UIViewControllerTransitionCoordinator) {
+        super.viewWillTransition(to: size, with: coordinator)
+        
+        //set the layout
+        let width = size.width/3
+        let layout = collectionView.collectionViewLayout as! UICollectionViewFlowLayout
+        layout.itemSize = CGSize(width: width, height: width)
+        
+    }
+    
     @IBAction func newCollectionButton(_ sender: Any) {
         print("new collection got called")
         //TODO set the code to get a new Collection.
