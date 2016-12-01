@@ -6,7 +6,6 @@
     <dependencies>
         <deployment identifier="iOS"/>
         <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="11524"/>
-        <capability name="Aspect ratio constraints" minToolsVersion="5.1"/>
         <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
     </dependencies>
     <scenes>
@@ -151,7 +150,7 @@
                             <collectionView clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="scaleToFill" dataMode="prototypes" translatesAutoresizingMaskIntoConstraints="NO" id="kZK-wE-RqB">
                                 <rect key="frame" x="0.0" y="170" width="375" height="447"/>
                                 <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
-                                <collectionViewFlowLayout key="collectionViewLayout" minimumLineSpacing="10" minimumInteritemSpacing="10" id="rgF-GD-d3g">
+                                <collectionViewFlowLayout key="collectionViewLayout" minimumLineSpacing="0.0" minimumInteritemSpacing="0.0" id="rgF-GD-d3g">
                                     <size key="itemSize" width="96" height="94"/>
                                     <size key="headerReferenceSize" width="0.0" height="0.0"/>
                                     <size key="footerReferenceSize" width="0.0" height="0.0"/>
@@ -166,17 +165,15 @@
                                             <autoresizingMask key="autoresizingMask"/>
                                             <subviews>
                                                 <imageView userInteractionEnabled="NO" contentMode="scaleToFill" horizontalHuggingPriority="251" verticalHuggingPriority="251" translatesAutoresizingMaskIntoConstraints="NO" id="SFY-tp-SQ5">
-                                                    <rect key="frame" x="3" y="3" width="90" height="88"/>
-                                                    <constraints>
-                                                        <constraint firstAttribute="height" constant="88" id="0fI-uB-M44"/>
-                                                        <constraint firstAttribute="width" secondItem="SFY-tp-SQ5" secondAttribute="height" multiplier="44:43" id="ML0-Mc-Pk4"/>
-                                                    </constraints>
+                                                    <rect key="frame" x="1" y="1" width="94" height="92"/>
                                                 </imageView>
                                             </subviews>
                                         </view>
                                         <constraints>
-                                            <constraint firstItem="SFY-tp-SQ5" firstAttribute="centerY" secondItem="tGC-dM-oId" secondAttribute="centerY" id="d3u-VV-hEY"/>
-                                            <constraint firstItem="SFY-tp-SQ5" firstAttribute="centerX" secondItem="tGC-dM-oId" secondAttribute="centerX" id="ioc-TZ-VYG"/>
+                                            <constraint firstAttribute="bottom" secondItem="SFY-tp-SQ5" secondAttribute="bottom" constant="1" id="HOO-kl-Epq"/>
+                                            <constraint firstItem="SFY-tp-SQ5" firstAttribute="leading" secondItem="tGC-dM-oId" secondAttribute="leading" constant="1" id="PvM-85-qrR"/>
+                                            <constraint firstItem="SFY-tp-SQ5" firstAttribute="top" secondItem="tGC-dM-oId" secondAttribute="top" constant="1" id="RV4-p7-vuj"/>
+                                            <constraint firstAttribute="trailing" secondItem="SFY-tp-SQ5" secondAttribute="trailing" constant="1" id="W5m-2V-Xor"/>
                                         </constraints>
                                         <connections>
                                             <outlet property="imageView" destination="SFY-tp-SQ5" id="0ze-6J-TBc"/>

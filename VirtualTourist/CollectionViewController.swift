@@ -35,6 +35,13 @@ class CollectionViewController: UIViewController{
     @IBOutlet weak var collectionView: UICollectionView!
     
     override func viewDidLoad() {
+        
+        //set the layout 
+        let width = collectionView!.frame.width/3
+        let layout = collectionView.collectionViewLayout as! UICollectionViewFlowLayout
+        layout.itemSize = CGSize(width: width, height: width)
+        
+        
         collectionView.isHidden = false
         NoPhotosView.isHidden = true
         newCollectionButton.isEnabled = false
