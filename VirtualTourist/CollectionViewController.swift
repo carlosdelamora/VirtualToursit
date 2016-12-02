@@ -280,8 +280,6 @@ extension CollectionViewController: UICollectionViewDelegate, UICollectionViewDa
                     cell.imageView.image = image
                 }
                 
-                
-                
             }
         }else{
             //If this is not the first download then then we get and arrayOfPhotos from Core Data
@@ -320,6 +318,11 @@ extension CollectionViewController: UICollectionViewDelegate, UICollectionViewDa
         activityIndicator.startAnimating()
         cellView.addSubview(activityIndicator)
     }
+    
+    func collectionView(_ collectionView: UICollectionView, didDeselectItemAt indexPath: IndexPath) {
+        
+    }
+    
 
 }
 
