@@ -13,4 +13,10 @@ class CollectionCell: UICollectionViewCell{
     
     @IBOutlet weak var imageView: UIImageView!
     
+    
+    var editing: Bool = false {
+        didSet{
+            imageView.alpha = editing ? 0.2 : 1
+        }
+    }
 }

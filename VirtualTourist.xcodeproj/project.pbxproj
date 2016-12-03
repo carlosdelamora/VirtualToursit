@@ -31,6 +31,7 @@
 		CA4C792E1DE6048B004EC008 /* Photo+CoreDataProperties.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "Photo+CoreDataProperties.swift"; sourceTree = "<group>"; };
 		CA4C792F1DE6048B004EC008 /* Pin+CoreDataClass.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "Pin+CoreDataClass.swift"; sourceTree = "<group>"; };
 		CA4C79301DE6048B004EC008 /* Pin+CoreDataProperties.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "Pin+CoreDataProperties.swift"; sourceTree = "<group>"; };
+		CA5ADF721DF26A89003ACDD5 /* Model3.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = Model3.xcdatamodel; sourceTree = "<group>"; };
 		CAB97DA71DDCBD3F00C9EACA /* VirtualTourist.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = VirtualTourist.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		CAB97DAA1DDCBD3F00C9EACA /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		CAB97DAF1DDCBD3F00C9EACA /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/Main.storyboard; sourceTree = "<group>"; };
@@ -379,10 +380,11 @@
 		CAB97DCC1DE3EEED00C9EACA /* Model.xcdatamodeld */ = {
 			isa = XCVersionGroup;
 			children = (
+				CA5ADF721DF26A89003ACDD5 /* Model3.xcdatamodel */,
 				CA2E779D1DED02D900F04CD0 /* Model2.xcdatamodel */,
 				CAB97DCD1DE3EEED00C9EACA /* Model.xcdatamodel */,
 			);
-			currentVersion = CA2E779D1DED02D900F04CD0 /* Model2.xcdatamodel */;
+			currentVersion = CA5ADF721DF26A89003ACDD5 /* Model3.xcdatamodel */;
 			path = Model.xcdatamodeld;
 			sourceTree = "<group>";
 			versionGroupType = wrapper.xcdatamodel;

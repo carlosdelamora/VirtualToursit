@@ -119,24 +119,16 @@
                             <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="1eC-sd-NUz" userLabel="NewCollectionView">
                                 <rect key="frame" x="0.0" y="617" width="375" height="50"/>
                                 <subviews>
-                                    <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" hasAttributedTitle="YES" translatesAutoresizingMaskIntoConstraints="NO" id="zzt-Or-hwy">
-                                        <rect key="frame" x="87" y="5.5" width="200" height="40"/>
+                                    <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="zzt-Or-hwy">
+                                        <rect key="frame" x="7" y="5.5" width="360" height="40"/>
                                         <constraints>
-                                            <constraint firstAttribute="width" constant="200" id="H2m-rN-CTw"/>
+                                            <constraint firstAttribute="width" constant="360" id="H2m-rN-CTw"/>
                                             <constraint firstAttribute="height" constant="40" id="tDj-g7-ICx"/>
                                         </constraints>
-                                        <state key="normal">
-                                            <attributedString key="attributedTitle">
-                                                <fragment content="New Collection">
-                                                    <attributes>
-                                                        <font key="NSFont" size="20" name="Helvetica"/>
-                                                        <paragraphStyle key="NSParagraphStyle" alignment="center" lineBreakMode="wordWrapping" baseWritingDirection="natural" tighteningFactorForTruncation="0.0"/>
-                                                    </attributes>
-                                                </fragment>
-                                            </attributedString>
-                                        </state>
+                                        <fontDescription key="fontDescription" name="Helvetica" family="Helvetica" pointSize="17"/>
+                                        <state key="normal" title="   "/>
                                         <connections>
-                                            <action selector="newCollectionButton:" destination="X94-Xe-PbI" eventType="touchUpInside" id="j1Q-1L-gde"/>
+                                            <action selector="newCollectionButtonTapped:" destination="X94-Xe-PbI" eventType="touchUpInside" id="XM9-cS-egT"/>
                                         </connections>
                                     </button>
                                 </subviews>

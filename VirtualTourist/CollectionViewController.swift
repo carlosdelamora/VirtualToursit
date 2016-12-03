@@ -23,9 +23,10 @@ class CollectionViewController: UIViewController{
     var firstDawnload: Bool = true
     var placeHolderNumber: Int = 0
     var myDataArray = [Data?]()
+    //var dataArgumentArray = [Data]()
     var preDataArray = [[String: AnyObject]]()
     var viewWillDisapear: Bool = false
-    
+    var attributes: NSAttributedString?
     
     @IBOutlet weak var noImagesLabel: UILabel!
     @IBOutlet weak var NoPhotosView: UIView!
@@ -36,12 +37,17 @@ class CollectionViewController: UIViewController{
     
     override func viewDidLoad() {
         
+        
+        newCollectionButton.setTitle("Collection", for: .normal)
+        
         //set the layout 
         let width = collectionView!.frame.width/3
         let layout = collectionView.collectionViewLayout as! UICollectionViewFlowLayout
         layout.itemSize = CGSize(width: width, height: width)
-        
-        
+        print("view did load")
+        print("we have the attributes \(newCollectionButton.currentAttributedTitle)")
+        attributes = newCollectionButton.currentAttributedTitle
+        collectionView!.allowsMultipleSelection = true
         collectionView.isHidden = false
         NoPhotosView.isHidden = true
         newCollectionButton.isEnabled = false
@@ -127,19 +133,47 @@ class CollectionViewController: UIViewController{
         
     }
     
-    @IBAction func newCollectionButton(_ sender: Any) {
-        print("new collection got called")
-        //TODO set the code to get a new Collection.
-        firstDawnload = false
-        let numberOfPhotos = arrayOfPhotos.count
-        if 21 < numberOfPhotos{
-            arrayOfPhotos = Array(arrayOfPhotos[21...numberOfPhotos-1])
+    @IBAction func newCollectionButtonTapped(_ sender: Any) {
+        
+        print("new collection got called \(newCollectionButton.titleLabel!.text!)")
+        if newCollectionButton.titleLabel!.text! == "New Collection"{
+            //TODO set the code to get a new Collection.
+            firstDawnload = false
+            let numberOfPhotos = arrayOfPhotos.count
+            if 21 < numberOfPhotos{
+                arrayOfPhotos = Array(arrayOfPhotos[21...numberOfPhotos-1])
+            }else{
+                arrayOfPhotos = [Photo]()
+            }
+            collectionView.reloadData()
+            print("the button is enabled")
         }else{
-            arrayOfPhotos = [Photo]()
+            
+            if firstDawnload{
+                let indexPaths = collectionView.indexPathsForSelectedItems! as [IndexPath]
+                var dataArgumentArray = [Data]()
+                for indexPath in indexPaths{
+                    let data = myDataArray[indexPath.item]
+                    dataArgumentArray.append(data!)
+                }
+                
+                for data in dataArgumentArray{
+                    //print(data as! String)
+                    let photosToErase = arrayOfPhotos.filter{ $0.imageData! as Data == data}
+                    print("let \(photosToErase)")
+                    guard let photoToErase = photosToErase.first else{
+                        print("the photo was not found ")
+                        return
+                    }
+                    
+                    
+                    context!.delete(photoToErase)
+                }
+            }
         }
-        collectionView.reloadData()
-        print("the button is enabled")
+        
     }
+
     
     
     private func bboxString(_ latitude: Double?, _ longitude: Double?) -> String {
@@ -248,28 +282,28 @@ extension CollectionViewController: UICollectionViewDelegate, UICollectionViewDa
     func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
         let a = firstDawnload ? placeHolderNumber : arrayOfPhotos.count
         
-        print("numbersOfItemsInSection got called, the placeHolderNumber array has \(placeHolderNumber) arrayOfPhotos has \(arrayOfPhotos.count) photos")
-        print("a=\(a) is it first download \(firstDawnload)")
+        /*print("numbersOfItemsInSection got called, the placeHolderNumber array has \(placeHolderNumber) arrayOfPhotos has \(arrayOfPhotos.count) photos")
+        print("a=\(a) is it first download \(firstDawnload)")*/
         return min(21, a)
     }
     
     func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
         let cell = collectionView.dequeueReusableCell(withReuseIdentifier: "Cell", for: indexPath) as!
         CollectionCell
-        print("collectionView got called")
+        //print("collectionView got called")
         
         //if is the first download we use myDataArray which is an array that was recently downloaded
         if firstDawnload{
             //If data is downloading we place an acitvity indicator in the cell
             if dataIsDownloading {
-                print("data is downloading")
+                //print("data is downloading")
                 performUIUpdatesOnMain {
                     self.addActyIndicator(cell.imageView)
                 }
                 
             }else{
                 //if the data is no longer donwloading we place an image cell in the array
-                print("we have pictures in the array")
+               // print("we have pictures in the array")
                 
                 let data = myDataArray[indexPath.row]
                 performUIUpdatesOnMain {
@@ -319,8 +353,25 @@ extension CollectionViewController: UICollectionViewDelegate, UICollectionViewDa
         cellView.addSubview(activityIndicator)
     }
     
+    func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
+        
+        let cell = collectionView.cellForItem(at: indexPath) as! CollectionCell
+        cell.editing = true
+       
+        newCollectionButton.setTitle("Remove Selected Pictures", for: .normal)
+        
+    
+        
+    }
+    
     func collectionView(_ collectionView: UICollectionView, didDeselectItemAt indexPath: IndexPath) {
         
+        let cell = collectionView.cellForItem(at: indexPath) as! CollectionCell
+        cell.editing = false
+        
+        if collectionView.indexPathsForSelectedItems?.count == 0{
+            newCollectionButton.setTitle("New Collection", for: .normal)
+        }
     }
     
 
