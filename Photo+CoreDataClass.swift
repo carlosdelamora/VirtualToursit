@@ -2,13 +2,12 @@
 //  Photo+CoreDataClass.swift
 //  VirtualTourist
 //
-//  Created by Carlos De la mora on 11/23/16.
+//  Created by Carlos De la mora on 12/3/16.
 //  Copyright © 2016 Carlos De la mora. All rights reserved.
 //
 
 import Foundation
 import CoreData
-
 
 
 public class Photo: NSManagedObject {
@@ -17,6 +16,7 @@ public class Photo: NSManagedObject {
             self.init(entity: ent, insertInto: context)
             self.imageData = data as NSData
             self.photoToPin = pin
+            self.url_m = url_m
         }else{
             fatalError("there was an error with initalization")
         }

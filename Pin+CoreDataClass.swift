@@ -2,7 +2,7 @@
 //  Pin+CoreDataClass.swift
 //  VirtualTourist
 //
-//  Created by Carlos De la mora on 11/23/16.
+//  Created by Carlos De la mora on 12/3/16.
 //  Copyright © 2016 Carlos De la mora. All rights reserved.
 //
 
@@ -28,5 +28,5 @@ public class Pin: NSManagedObject {
         }
         
     }
-
+    
 }

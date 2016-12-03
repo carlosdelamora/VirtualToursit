@@ -378,9 +378,7 @@ extension CollectionViewController: UICollectionViewDelegate, UICollectionViewDa
         cell.editing = true
        
         newCollectionButton.setTitle("Remove Selected Pictures", for: .normal)
-        
     
-        
     }
     
     func collectionView(_ collectionView: UICollectionView, didDeselectItemAt indexPath: IndexPath) {

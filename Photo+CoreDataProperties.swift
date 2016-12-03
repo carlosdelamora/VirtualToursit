@@ -2,7 +2,7 @@
 //  Photo+CoreDataProperties.swift
 //  VirtualTourist
 //
-//  Created by Carlos De la mora on 11/23/16.
+//  Created by Carlos De la mora on 12/3/16.
 //  Copyright © 2016 Carlos De la mora. All rights reserved.
 //
 
@@ -17,6 +17,7 @@ extension Photo {
     }
 
     @NSManaged public var imageData: NSData?
-    @NSManaged public var photoToPin: Pin
+    @NSManaged public var url_m: String?
+    @NSManaged public var photoToPin: Pin?
 
 }
