@@ -12,7 +12,7 @@ import CoreData
 
 
 public class Photo: NSManagedObject {
-    convenience init(_ data: Data, _ pin: Pin , _ context: NSManagedObjectContext){
+    convenience init(_ url_m: String , _ data: Data, _ pin: Pin , _ context: NSManagedObjectContext){
         if let ent = NSEntityDescription.entity(forEntityName: "Photo", in: context){
             self.init(entity: ent, insertInto: context)
             self.imageData = data as NSData
