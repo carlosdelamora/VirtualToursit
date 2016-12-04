@@ -125,7 +125,7 @@ class CollectionViewController: UIViewController{
     
     override func viewWillTransition(to size: CGSize, with coordinator: UIViewControllerTransitionCoordinator) {
         super.viewWillTransition(to: size, with: coordinator)
-        
+        //perform updates in main?
         //set the layout
         let width = size.width/3
         let layout = collectionView.collectionViewLayout as! UICollectionViewFlowLayout
@@ -147,13 +147,36 @@ class CollectionViewController: UIViewController{
             collectionView.reloadData()
             print("the button is enabled")
         }else{
+            guard let indexPaths = collectionView!.indexPathsForSelectedItems else{
+                return
+            }
+            for indexPath in indexPaths{
+                var photos = [Photo]()
+                let aPhoto = arrayOfPhotos[indexPath.item]
+                let url_m = aPhoto.url_m!
+                print("the url_m is \(url_m)")
+                let fetchRequest = NSFetchRequest<NSFetchRequestResult>(entityName: "Photo")
+                let predicate = NSPredicate(format: "url_m = %@", url_m)
+                //let predicate = NSPredicate(format: "photoToPin = %@", argumentArray: [pin!])
+                fetchRequest.predicate = predicate
+                do{
+                    photos = try context?.fetch(fetchRequest) as! [Photo]
+                }catch{
+                    print("we could not get the photo from the fetch")
+                }
+                
+                if let photo = photos.first{
+                    context?.delete(photo)
+                }
+                print("the number of photos in arrayOfPhotos is \(arrayOfPhotos.count)")
+                arrayOfPhotos.remove(at: indexPath.item)
+                print("the number of photos in arrayOfPhotos is \(arrayOfPhotos.count)")
+            }
             
-         
+            collectionView.deleteItems(at: indexPaths)
         }
         
     }
-
-    
     
     private func bboxString(_ latitude: Double?, _ longitude: Double?) -> String {
         // ensure bbox is bounded by minimum and maximums
@@ -188,7 +211,6 @@ class CollectionViewController: UIViewController{
         return
         }
         
-        
         // we use this number to populate the table with activity inidcators
         placeHolderNumber = min(total,21)
        
@@ -221,19 +243,19 @@ class CollectionViewController: UIViewController{
             }
             
             //we need to create the photoArray and use it to populate the collection view.
-            //we create myData array with max of 21 pictures
+            //we create myUrlArray with max of 21 url's strings
             let myUrlArray = photosDictionaryArray[0...placeHolderNumber-1].map({getUrlString($0)
                 })
             //Instantiate the photos from the url's in myUrlArray and save them to core Data
             let _ = createPhoto(myUrlArray, pin)
             print("we have created the first 21 pictures")
             //If we have more than 21 pictures downloaded we instantiate more photos to be saved in the core Data
-            if total > 21{
+            /*if total > 21{
                 let extra = min(70,total)
                 print("we have total = \(total), extra = \(extra) and photosDictionaryArray.count = \(photosDictionaryArray.count)")
                 let aUrlStringArray = photosDictionaryArray[placeHolderNumber...extra-1].map({getUrlString($0)})
                 let _ = createPhoto(aUrlStringArray, pin)
-            }
+            }*/
             
             let fetchRequest = NSFetchRequest<NSFetchRequestResult>(entityName: "Photo")
             let predicate = NSPredicate(format: "photoToPin = %@", argumentArray: [pin!])
@@ -292,9 +314,6 @@ class CollectionViewController: UIViewController{
         
         return imageData
     }
-    
-
-    
 }
 
 
@@ -310,26 +329,22 @@ extension CollectionViewController: UICollectionViewDelegate, UICollectionViewDa
         CollectionCell
         
         print("collection View got called data is downloading \(dataIsDownloading)")
-        //if is the first download we use myDataArray which is an array that was recently downloaded
-       // if firstDawnload{
-            //If data is downloading we place an acitvity indicator in the cell
-            if dataIsDownloading {
-                
-                performUIUpdatesOnMain {
-                    self.addActyIndicator(cell.imageView)
-                }
-                
-            }else{
-               //if the data is no longer donwloading we place an image cell in the array
-                performUIUpdatesOnMain {
-                    let photo = self.arrayOfPhotos[indexPath.row]
-                    guard let image = UIImage(data: photo.imageData as! Data) else{
-                        return
-                    }
-                    cell.imageView.image = image
-                }
-                
+        //If is the first download we use myDataArray which is an array that was recently downloaded
+        //If data is downloading we place an acitvity indicator in the cell
+        if dataIsDownloading {
+            performUIUpdatesOnMain {
+                self.addActyIndicator(cell.imageView)
             }
+        }else{
+           //if the data is no longer donwloading we place an image cell in the array
+            performUIUpdatesOnMain {
+                let photo = self.arrayOfPhotos[indexPath.row]
+                guard let image = UIImage(data: photo.imageData as! Data) else{
+                    return
+                }
+                cell.imageView.image = image
+            }
+        }
         return cell
     }
     
