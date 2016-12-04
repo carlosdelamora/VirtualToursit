@@ -55,13 +55,9 @@ class FlickFinderClient:NSObject{
             }
             
             if (error != nil){
-            
-                    //TODO: check for the error
-                    completionHandeler([String: AnyObject](),error)
-                
-                
+                //TODO: check for the error
+                completionHandeler([String: AnyObject](),error)
                 displayError("\(error)")
-                
             }
             
             guard let jsonData = self.closureForTask(data, response, error) else{
@@ -70,16 +66,11 @@ class FlickFinderClient:NSObject{
             }
             
             //if there is no error we use this completion handeler on GCD
-            
-                completionHandeler(jsonData, nil)
-    
-            
+            completionHandeler(jsonData, nil)
         }
         
         // start the task!
         task.resume()
-    
-
     }
     
     //we use this closure for task to get a jsonData as a [String: AnyObject]?
@@ -109,8 +100,4 @@ class FlickFinderClient:NSObject{
         //print("here is the jsonData closureForTask \(jsonData)")
         return jsonData as? [String:AnyObject]
     }
-
-    
-    
-    
 }
