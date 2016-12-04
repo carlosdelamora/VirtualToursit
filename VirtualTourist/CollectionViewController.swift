@@ -150,6 +150,7 @@ class CollectionViewController: UIViewController{
             guard let indexPaths = collectionView!.indexPathsForSelectedItems else{
                 return
             }
+            var indexesToRemove = Set<Int>()
             for indexPath in indexPaths{
                 var photos = [Photo]()
                 let aPhoto = arrayOfPhotos[indexPath.item]
@@ -168,11 +169,12 @@ class CollectionViewController: UIViewController{
                 if let photo = photos.first{
                     context?.delete(photo)
                 }
-                print("the number of photos in arrayOfPhotos is \(arrayOfPhotos.count)")
-                arrayOfPhotos.remove(at: indexPath.item)
-                print("the number of photos in arrayOfPhotos is \(arrayOfPhotos.count)")
+                //print("the number of photos in arrayOfPhotos is \(arrayOfPhotos.count)")
+                //arrayOfPhotos.remove(at: indexPath.item)
+                //print("the number of photos in arrayOfPhotos is \(arrayOfPhotos.count)")
+                indexesToRemove.insert(indexPath.item)
             }
-            
+            arrayOfPhotos = arrayOfPhotos.enumerated().filter({!indexesToRemove.contains($0.offset)}).map({$0.element})
             collectionView.deleteItems(at: indexPaths)
         }
         
@@ -343,6 +345,11 @@ extension CollectionViewController: UICollectionViewDelegate, UICollectionViewDa
                     return
                 }
                 cell.imageView.image = image
+                if (collectionView.indexPathsForSelectedItems?.contains(indexPath))!{
+                    cell.editing = true
+                }else{
+                    cell.editing = false 
+                }
             }
         }
         return cell
