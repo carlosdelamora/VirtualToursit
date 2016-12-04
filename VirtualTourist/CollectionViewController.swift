@@ -22,7 +22,7 @@ class CollectionViewController: UIViewController{
     var dataIsDownloading: Bool = true
     var firstDawnload: Bool = true
     var placeHolderNumber: Int = 0
-    var myUrlArray = [String]()
+    //var myUrlArray = [String]()
     //var dataArgumentArray = [Data]()
     var preDataArray = [[String: AnyObject]]()
     var viewWillDisapear: Bool = false
@@ -38,7 +38,7 @@ class CollectionViewController: UIViewController{
     override func viewDidLoad() {
         
         
-        newCollectionButton.setTitle("Collection", for: .normal)
+        newCollectionButton.setTitle("New Collection", for: .normal)
         
         //set the layout 
         let width = collectionView!.frame.width/3
@@ -137,8 +137,7 @@ class CollectionViewController: UIViewController{
         
         print("new collection got called \(newCollectionButton.titleLabel!.text!)")
         if newCollectionButton.titleLabel!.text! == "New Collection"{
-            //TODO set the code to get a new Collection.
-            firstDawnload = false
+            
             let numberOfPhotos = arrayOfPhotos.count
             if 21 < numberOfPhotos{
                 arrayOfPhotos = Array(arrayOfPhotos[21...numberOfPhotos-1])
@@ -149,27 +148,7 @@ class CollectionViewController: UIViewController{
             print("the button is enabled")
         }else{
             
-            if firstDawnload{
-            /*    let indexPaths = collectionView.indexPathsForSelectedItems! as [IndexPath]
-                var dataArgumentArray = [Data]()
-                for indexPath in indexPaths{
-                    let data = myDataArray[indexPath.item]
-                    dataArgumentArray.append(data!)
-                }
-                
-                for data in dataArgumentArray{
-                    //print(data as! String)
-                    let photosToErase = arrayOfPhotos.filter{ $0.imageData! as Data == data}
-                    print("let \(photosToErase)")
-                    guard let photoToErase = photosToErase.first else{
-                        print("the photo was not found ")
-                        return
-                    }
-                    
-                    
-                    context!.delete(photoToErase)
-                }*/
-            }
+         
         }
         
     }
@@ -232,22 +211,34 @@ class CollectionViewController: UIViewController{
                 self.noImagesLabel.text = "This pin has no images"
             }
         }else {
+            
+            
+            func getUrlString(_ photosDictionary:[String: AnyObject])->String?{
+                guard let urlString = photosDictionary[Constants.FlickrResponseKeys.MediumURL] as? String else{
+                    return nil
+                }
+                return urlString
+            }
+            
             //we need to create the photoArray and use it to populate the collection view.
             //we create myData array with max of 21 pictures
-            myUrlArray = photosDictionaryArray[0...placeHolderNumber-1].map({$0[Constants.FlickrResponseKeys.MediumURL] as! String})
+            let myUrlArray = photosDictionaryArray[0...placeHolderNumber-1].map({getUrlString($0)
+                })
             //Instantiate the photos from the url's in myUrlArray and save them to core Data
             let _ = createPhoto(myUrlArray, pin)
+            print("we have created the first 21 pictures")
             //If we have more than 21 pictures downloaded we instantiate more photos to be saved in the core Data
             if total > 21{
                 let extra = min(70,total)
-                let aUrlStringArray = photosDictionaryArray[placeHolderNumber...extra-1].map({$0[Constants.FlickrResponseKeys.MediumURL] as! String})
+                print("we have total = \(total), extra = \(extra) and photosDictionaryArray.count = \(photosDictionaryArray.count)")
+                let aUrlStringArray = photosDictionaryArray[placeHolderNumber...extra-1].map({getUrlString($0)})
                 let _ = createPhoto(aUrlStringArray, pin)
             }
             
             let fetchRequest = NSFetchRequest<NSFetchRequestResult>(entityName: "Photo")
             let predicate = NSPredicate(format: "photoToPin = %@", argumentArray: [pin!])
             fetchRequest.predicate = predicate
-            
+            print("we fetch the request")
             do{
                 if let results = try context?.fetch(fetchRequest) as? [Photo]{
                     print("we have this number of photos in core data \(results.count)")
@@ -270,29 +261,20 @@ class CollectionViewController: UIViewController{
     
     
     // We use this function to make an photoArray out of an array of urlStrings
-    func createPhoto(_ urlStringArray: [String], _ aPin: Pin? )-> [Photo]{
-        var photoArray = [Photo]()
+    func createPhoto(_ urlStringArray: [String?], _ aPin: Pin? ){
+        
         for imageUrlString in urlStringArray {
-            print("\(imageUrlString)")
-            guard let url = URL(string: imageUrlString) else{
-                print("the url was not cast as a string we return nil for the data")
-                return photoArray
+            
+            if let imageUrlString = imageUrlString, let url = URL(string: imageUrlString), let imageData = try? Data(contentsOf: url), let aPin = aPin{
+                //if view is about to disapear we do not want to create more photos because we may erase a pin we are trying to attach a photo and that will crash the application. This may happen even after unwraping the aPin because by the time we save to the context the pin may not exist
+                if viewWillDisapear{
+                    return
+                }
+                let _ = Photo( imageUrlString, imageData, aPin, context!)
             }
             
-            guard let imageData = try? Data(contentsOf: url) else{
-                return photoArray            }
-
-            guard let aPin = aPin else {
-                return photoArray
-            }
-            if viewWillDisapear{
-                return photoArray
-            }
-            let photo = Photo( imageUrlString, imageData, aPin, context!)
-            photoArray.append(photo)
-        }
-        
-        return photoArray
+            
+                    }
     }
     
     func getDataFromArray(_ photoDictionary: [String: AnyObject]) -> Data?{
@@ -320,10 +302,8 @@ class CollectionViewController: UIViewController{
 
 extension CollectionViewController: UICollectionViewDelegate, UICollectionViewDataSource {
     func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
-        let a = firstDawnload ? placeHolderNumber : arrayOfPhotos.count
+        let a = arrayOfPhotos.count
         
-        /*print("numbersOfItemsInSection got called, the placeHolderNumber array has \(placeHolderNumber) arrayOfPhotos has \(arrayOfPhotos.count) photos")
-        print("a=\(a) is it first download \(firstDawnload)")*/
         return min(21, a)
     }
     
@@ -331,7 +311,7 @@ extension CollectionViewController: UICollectionViewDelegate, UICollectionViewDa
         let cell = collectionView.dequeueReusableCell(withReuseIdentifier: "Cell", for: indexPath) as!
         CollectionCell
         
-        
+        print("collection View got called")
         //if is the first download we use myDataArray which is an array that was recently downloaded
        // if firstDawnload{
             //If data is downloading we place an acitvity indicator in the cell
@@ -352,14 +332,6 @@ extension CollectionViewController: UICollectionViewDelegate, UICollectionViewDa
                 }
                 
             }
-       /* }else{
-            //If this is not the first download then then we get and arrayOfPhotos from Core Data
-            let data = arrayOfPhotos[indexPath.row].imageData as! Data
-            let image = UIImage(data: data)
-            performUIUpdatesOnMain {
-                cell.imageView.image = image
-            }
-        }*/
         return cell
     }
     
