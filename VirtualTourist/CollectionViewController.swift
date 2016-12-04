@@ -272,9 +272,7 @@ class CollectionViewController: UIViewController{
                 }
                 let _ = Photo( imageUrlString, imageData, aPin, context!)
             }
-            
-            
-                    }
+        }
     }
     
     func getDataFromArray(_ photoDictionary: [String: AnyObject]) -> Data?{
@@ -302,8 +300,8 @@ class CollectionViewController: UIViewController{
 
 extension CollectionViewController: UICollectionViewDelegate, UICollectionViewDataSource {
     func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
-        let a = arrayOfPhotos.count
-        
+        let a = dataIsDownloading ? placeHolderNumber :arrayOfPhotos.count
+        print("a=\(a)")
         return min(21, a)
     }
     
@@ -311,7 +309,7 @@ extension CollectionViewController: UICollectionViewDelegate, UICollectionViewDa
         let cell = collectionView.dequeueReusableCell(withReuseIdentifier: "Cell", for: indexPath) as!
         CollectionCell
         
-        print("collection View got called")
+        print("collection View got called data is downloading \(dataIsDownloading)")
         //if is the first download we use myDataArray which is an array that was recently downloaded
        // if firstDawnload{
             //If data is downloading we place an acitvity indicator in the cell
