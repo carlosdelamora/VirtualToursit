@@ -71,11 +71,7 @@ class MapViweController: UIViewController{
         
         annotations = pins.map({$0.annotation})
         print("we have this number of annotations \(annotations.count)")
-        //mapView.addAnnotation(annotations.first!)
-        
         mapView.addAnnotations(annotations)
-
-        
         }
     
     override func viewWillAppear(_ animated: Bool) {
@@ -124,12 +120,16 @@ class MapViweController: UIViewController{
         
     }
     
+    func saves(){
+        let appDelegate = UIApplication.shared.delegate as! AppDelegate
+        let stack = appDelegate.stack
+        stack?.saves()
+    }
     
     func dropAPin(){
         
         //get the gesture
         let longGesture = mapView.gestureRecognizers!.first
-        
         
         //meake sure the gesture is at the begining of the state when it gets called to avoid calling more than once. 
         if longGesture?.state == UIGestureRecognizerState.began{
@@ -145,7 +145,8 @@ class MapViweController: UIViewController{
             //create Pin to save it into core Data append it to the array pins
             let pin = Pin(latitude: annotation.coordinate.latitude, longitude: annotation.coordinate.longitude, context: context!)
             pins.append(pin)
-            print("the new pin deropded has coordinates\(pin.annotation.coordinate)")
+            saves()
+            print("the new pin deropded has coordinates\(pin.annotation.coordinate) the pin has been saved to core data")
         }        
     }
 }
@@ -165,7 +166,6 @@ extension MapViweController: MKMapViewDelegate{
         }else{
             pinView!.annotation = annotation
         }
-        
         return pinView
     }
     
@@ -188,29 +188,21 @@ extension MapViweController: MKMapViewDelegate{
             let pinSelected = self.pinFromAnnotation(view.annotation as! MKPointAnnotation)
             if let pinToRemove = pinSelected {
                 self.context?.delete(pinToRemove)
+                saves()
             }else{
                 print("we did not find the a pin")
             }
             performUIUpdatesOnMain {
                 self.mapView.removeAnnotation(view.annotation!)
             }
-
-            
-            
-            //we want to delete the pin
-            
-            
         }else{
-            
             // find the pin among those that have been posted on the map that are already in the data core
             let thePin = pinFromAnnotation(view.annotation!)
             let controller = self.storyboard?.instantiateViewController(withIdentifier: "CollectionViewController") as! CollectionViewController
 
             //set the pin in the controller
             controller.pin = thePin
-            
             self.navigationController?.pushViewController(controller, animated: true)
-            
             //set the button with the right title and font
             let backButton = UIBarButtonItem()
             backButton.title = "OK"
