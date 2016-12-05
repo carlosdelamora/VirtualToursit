@@ -133,35 +133,42 @@ class CollectionViewController: UIViewController{
     
     @IBAction func newCollectionButtonTapped(_ sender: Any) {
         
+        newCollectionButton.isEnabled = false
         print("new collection got called \(newCollectionButton.titleLabel!.text!)")
         if newCollectionButton.titleLabel!.text! == "New Collection"{
-            
+           
             let numberOfPhotos = preDataArray.count
             if 21 < numberOfPhotos{
                 placeHolderNumber = min(numberOfPhotos,42)
                 dataIsDownloading = true
-                performUIUpdatesOnMain {
-                    self.collectionView!.reloadData()
-                }
+                print("data is danwlading \(self.dataIsDownloading)")
+                collectionView!.reloadData()
                 preDataArray = Array(preDataArray[21...numberOfPhotos-1])
-                arrayOfPhotos = constructArrayOfPhotos(Array(preDataArray[21...placeHolderNumber-1]), pin!)
-                dataIsDownloading = false
-                print("we reload data")
-                
-                //now that we have the arrayOfPhotos we reload the collectionView
-                dataIsDownloading = false
-                print("we reload data")
-                performUIUpdatesOnMain {
+                //we need a delay so that reloadData has time to display the activity indicators 
+                DispatchQueue.main.asyncAfter(deadline: .now() + 0.1){
+                    self.arrayOfPhotos = self.constructArrayOfPhotos(Array(self.preDataArray[21...self.placeHolderNumber-1]), self.pin!)
+                    self.dataIsDownloading = false
                     self.collectionView?.reloadData()
                     self.newCollectionButton.isEnabled = true
                     self.newCollectionView.alpha = 1
+
                 }
+                //arrayOfPhotos = constructArrayOfPhotos(Array(preDataArray[21...placeHolderNumber-1]), pin!)
+                
+                //now that we have the arrayOfPhotos we reload the collectionView
+                //dataIsDownloading = false
+                print("we reload data")
+                
+                
             }else{
+                //TODO check this else
                 arrayOfPhotos = [Photo]()
+                //collectionView!.reloadData()
             }
-            collectionView.reloadData()
+            
             print("the button is enabled")
         }else{
+            print("we are in this part of the code")
             guard let indexPaths = collectionView!.indexPathsForSelectedItems else{
                 return
             }
@@ -274,12 +281,13 @@ class CollectionViewController: UIViewController{
     
        //we use this function to erase every photo in the pin, then create new arry of photos in core data fetch the results and display them in the collection view
     func constructArrayOfPhotos(_ preDataArray: [[String: AnyObject]], _ pin: Pin)-> [Photo]{
-        
+        print("constructArrayOfPhotos was called")
         var photosArray = [Photo]()
         
         for photo in arrayOfPhotos{
             context?.delete(photo)
         }
+        
         // set the context
         let appDelegate = UIApplication.shared.delegate as! AppDelegate
         let stack = appDelegate.stack
@@ -323,7 +331,7 @@ class CollectionViewController: UIViewController{
         }catch{
             fatalError("can not get the photos form core data")
         }
-        
+        print("consturct array of photos is about to end")
         return photosArray
     }
     
