@@ -8,8 +8,8 @@
 
 import Foundation
 
-func performUIUpdatesOnMain(_ updates: @escaping () -> Void) {
-    DispatchQueue.main.async {
+func performUIUpdatesOnMainWithDelay(_ delay: DispatchTime  = .now(), _ updates: @escaping () -> Void) {
+    DispatchQueue.main.asyncAfter(deadline: delay) {
         updates()
     }
 }

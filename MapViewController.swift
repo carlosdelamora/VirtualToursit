@@ -192,7 +192,7 @@ extension MapViweController: MKMapViewDelegate{
             }else{
                 print("we did not find the a pin")
             }
-            performUIUpdatesOnMain {
+            performUIUpdatesOnMainWithDelay {
                 self.mapView.removeAnnotation(view.annotation!)
             }
         }else{

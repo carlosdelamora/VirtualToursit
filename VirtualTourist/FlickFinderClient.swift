@@ -10,10 +10,10 @@ import Foundation
 import UIKit
 import MapKit
 
-class FlickFinderClient:NSObject{
+class FlickFinderClient {
     
     //this function allows us to have a shared instance
-   class func sharedInstance()-> FlickFinderClient {
+    class func sharedInstance()-> FlickFinderClient {
         struct Singelton{
              static var sharedInstance = FlickFinderClient()
         }
@@ -49,15 +49,14 @@ class FlickFinderClient:NSObject{
             // if an error occurs, print it and re-enable the UI
             func displayError(_ error: String) {
                 print(error)
-                performUIUpdatesOnMain {
-                    //TODO: display errors
-                }
+
             }
             
-            if (error != nil){
+            guard (error == nil) else{
                 //TODO: check for the error
                 completionHandeler([String: AnyObject](),error)
                 displayError("\(error)")
+                return
             }
             
             guard let jsonData = self.closureForTask(data, response, error) else{

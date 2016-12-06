@@ -20,13 +20,11 @@ class CollectionViewController: UIViewController{
     var arrayOfPhotos = [Photo]()
     var context : NSManagedObjectContext? = nil
     var dataIsDownloading: Bool = true
-    var firstDawnload: Bool = true
     var placeHolderNumber: Int = 0
-    //var myUrlArray = [String]()
-    //var dataArgumentArray = [Data]()
     var preDataArray = [[String: AnyObject]]()
     var viewWillDisapear: Bool = false
     var attributes: NSAttributedString?
+    let smallAlpha = CGFloat(0.25)
     
     @IBOutlet weak var noImagesLabel: UILabel!
     @IBOutlet weak var NoPhotosView: UIView!
@@ -37,9 +35,7 @@ class CollectionViewController: UIViewController{
     
     override func viewDidLoad() {
         
-        
         newCollectionButton.setTitle("New Collection", for: .normal)
-        
         //set the layout 
         let width = collectionView!.frame.width/3
         let layout = collectionView.collectionViewLayout as! UICollectionViewFlowLayout
@@ -51,7 +47,8 @@ class CollectionViewController: UIViewController{
         collectionView.isHidden = false
         NoPhotosView.isHidden = true
         newCollectionButton.isEnabled = false
-        newCollectionView.alpha = 0.25
+   
+        newCollectionView.alpha = smallAlpha
         //It does not look exactly as the demo app, I do not know how to make the border line to go even thiner. If I change the value below 0.25 the border disappears 
         self.newCollectionView.layer.borderWidth = 0.3
         
@@ -78,8 +75,7 @@ class CollectionViewController: UIViewController{
         
         do{
             if let results = try context?.fetch(fetchRequest) as? [Photo]{
-                print("first fetch we have this number of photos in core data \(results.count)")
-                arrayOfPhotos = results
+            arrayOfPhotos = results
             }
         }catch{
             fatalError("can not get the photos form core data")
@@ -87,8 +83,8 @@ class CollectionViewController: UIViewController{
         
         if (arrayOfPhotos.count) > 0{
             dataIsDownloading = false
-            self.newCollectionButton.isEnabled = true
-            self.newCollectionView.alpha = 1
+            newCollectionButton.isEnabled = true
+            newCollectionView.alpha = 1
             
         }else{
             print("since we do not have photos form core data we get photos online")
@@ -117,7 +113,7 @@ class CollectionViewController: UIViewController{
     }
     
     override func viewWillDisappear(_ animated: Bool) {
-        super.viewWillDisappear(true)
+        super.viewWillDisappear(animated)
         viewWillDisapear = true 
     }
     
@@ -142,28 +138,24 @@ class CollectionViewController: UIViewController{
                 placeHolderNumber = min(numberOfPhotos,42)
                 dataIsDownloading = true
                 print("data is danwlading \(self.dataIsDownloading)")
-                performUIUpdatesOnMain {
+                performUIUpdatesOnMainWithDelay {
                     self.collectionView!.reloadData()
                 }
-                
                 preDataArray = Array(preDataArray[21...numberOfPhotos-1])
                 
                 //we need a delay so that reloadData has time to display the activity indicators
-                DispatchQueue.main.asyncAfter(deadline: .now() + 0.1){
+                performUIUpdatesOnMainWithDelay(.now() + 0.1){
                     self.arrayOfPhotos = self.constructArrayOfPhotos(Array(self.preDataArray[21...self.placeHolderNumber-1]), self.pin!)
                     self.dataIsDownloading = false
                     self.collectionView?.reloadData()
                     self.newCollectionButton.isEnabled = true
                     self.newCollectionView.alpha = 1
-
                 }
             }else{
-                //TODO check this else
                 arrayOfPhotos = [Photo]()
                 collectionView!.reloadData()
             }
             
-            print("the button is enabled")
         }else{
             print("we are in this part of the code")
             guard let indexPaths = collectionView!.indexPathsForSelectedItems else{
@@ -192,6 +184,8 @@ class CollectionViewController: UIViewController{
             }
             arrayOfPhotos = arrayOfPhotos.enumerated().filter({!indexesToRemove.contains($0.offset)}).map({$0.element})
             collectionView.deleteItems(at: indexPaths)
+            newCollectionButton.isEnabled = true
+            newCollectionButton.setTitle("New Collection", for: .normal)
         }
         
     }
@@ -225,34 +219,30 @@ class CollectionViewController: UIViewController{
         }
 
         guard let total = Int((photosDictionary[Constants.FlickrResponseKeys.Total] as? String)!) else{
-        print("there is not total in jsonData")
+            print("there is not total in jsonData")
         return
         }
         
         // we use this number to populate the table with activity inidcators
         placeHolderNumber = min(total,21)
-       
-        print("perform updates in the collection Data ")
-        performUIUpdatesOnMain {
+        performUIUpdatesOnMainWithDelay {
             self.collectionView?.reloadData()
         }
         
         /* GUARD: Is the "photo" key in photosDictionary? */
         guard let photosDictionaryArray = photosDictionary[Constants.FlickrResponseKeys.Photo] as? [[String: AnyObject]] else {
-        print("Cannot find key '\(Constants.FlickrResponseKeys.Photo)' in \(jsonData)")
-        return
+            print("Cannot find key '\(Constants.FlickrResponseKeys.Photo)' in \(jsonData)")
+            return
         }
         
         if photosDictionaryArray.count == 0 {
             print("this pin has no images should appear")
-            performUIUpdatesOnMain {
+            performUIUpdatesOnMainWithDelay {
                 self.collectionView.isHidden = true
                 self.NoPhotosView.isHidden = false
                 self.noImagesLabel.text = "This pin has no images"
             }
         }else {
-            
-            
             func getUrlString(_ photosDictionary:[String: AnyObject])->String?{
                 guard let urlString = photosDictionary[Constants.FlickrResponseKeys.MediumURL] as? String else{
                     return nil
@@ -264,7 +254,7 @@ class CollectionViewController: UIViewController{
             //now that we have the arrayOfPhotos we reload the collectionView
             dataIsDownloading = false
             print("we reload data")
-            performUIUpdatesOnMain {
+            performUIUpdatesOnMainWithDelay {
                 self.collectionView?.reloadData()
                 self.newCollectionButton.isEnabled = true
                 self.newCollectionView.alpha = 1
@@ -278,18 +268,15 @@ class CollectionViewController: UIViewController{
     
        //we use this function to erase every photo in the pin, then create new arry of photos in core data fetch the results and display them in the collection view
     func constructArrayOfPhotos(_ preDataArray: [[String: AnyObject]], _ pin: Pin)-> [Photo]{
-        print("constructArrayOfPhotos was called")
-        var photosArray = [Photo]()
         
+        var photosArray = [Photo]()
         for photo in arrayOfPhotos{
             context?.delete(photo)
         }
-        
         // set the context
         let appDelegate = UIApplication.shared.delegate as! AppDelegate
         let stack = appDelegate.stack
         stack?.saves()
-        
         //we get out of a photoDictionary to return the urlString
         func getUrlString(_ photosDictionary:[String: AnyObject])->String?{
             guard let urlString = photosDictionary[Constants.FlickrResponseKeys.MediumURL] as? String else{
@@ -297,7 +284,6 @@ class CollectionViewController: UIViewController{
             }
             return urlString
         }
-        
         // We use this function to create Photos in core Data out of an array of urlStrings
         func createPhoto(_ urlStringArray: [String?], _ aPin: Pin? ){
             
@@ -322,8 +308,6 @@ class CollectionViewController: UIViewController{
         do{
             if let results = try context?.fetch(fetchRequest) as? [Photo]{
                 photosArray = results
-                print("we have this number of photos in core data \(results.count) we have this in photosArray \(photosArray.count)")
-                
             }
         }catch{
             fatalError("can not get the photos form core data")
@@ -331,7 +315,6 @@ class CollectionViewController: UIViewController{
         print("consturct array of photos is about to end")
         return photosArray
     }
-    
     
     func getDataFromArray(_ photoDictionary: [String: AnyObject]) -> Data?{
         guard let imageUrlString = photoDictionary[Constants.FlickrResponseKeys.MediumURL] as? String else{
@@ -354,6 +337,7 @@ class CollectionViewController: UIViewController{
 
 
 extension CollectionViewController: UICollectionViewDelegate, UICollectionViewDataSource {
+    
     func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
         let a = dataIsDownloading ? placeHolderNumber : arrayOfPhotos.count
         print("a=\(a)")
@@ -368,13 +352,13 @@ extension CollectionViewController: UICollectionViewDelegate, UICollectionViewDa
         //If is the first download we use myDataArray which is an array that was recently downloaded
         //If data is downloading we place an acitvity indicator in the cell
         if dataIsDownloading {
-            performUIUpdatesOnMain {
+            performUIUpdatesOnMainWithDelay {
                 cell.imageView.image = nil
                 self.addActyIndicator(cell.imageView)
             }
         }else{
            //if the data is no longer donwloading we place an image cell in the array
-            performUIUpdatesOnMain {
+            performUIUpdatesOnMainWithDelay {
                 let photo = self.arrayOfPhotos[indexPath.row]
                 guard let image = UIImage(data: photo.imageData as! Data) else{
                     return
@@ -403,21 +387,16 @@ extension CollectionViewController: UICollectionViewDelegate, UICollectionViewDa
         
         let cell = collectionView.cellForItem(at: indexPath) as! CollectionCell
         cell.editing = true
-       
         newCollectionButton.setTitle("Remove Selected Pictures", for: .normal)
-    
     }
     
     func collectionView(_ collectionView: UICollectionView, didDeselectItemAt indexPath: IndexPath) {
         
         let cell = collectionView.cellForItem(at: indexPath) as! CollectionCell
         cell.editing = false
-        
         if collectionView.indexPathsForSelectedItems?.count == 0{
             newCollectionButton.setTitle("New Collection", for: .normal)
         }
     }
-    
-
 }
 
