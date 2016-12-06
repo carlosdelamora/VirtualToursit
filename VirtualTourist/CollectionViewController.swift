@@ -36,10 +36,6 @@ class CollectionViewController: UIViewController{
     override func viewDidLoad() {
         
         newCollectionButton.setTitle("New Collection", for: .normal)
-        //set the layout 
-        let width = collectionView!.frame.width/3
-        let layout = collectionView.collectionViewLayout as! UICollectionViewFlowLayout
-        layout.itemSize = CGSize(width: width, height: width)
         print("view did load")
         print("we have the attributes \(newCollectionButton.currentAttributedTitle)")
         attributes = newCollectionButton.currentAttributedTitle
@@ -108,8 +104,14 @@ class CollectionViewController: UIViewController{
     }
     
     override func viewWillAppear(_ animated: Bool) {
-        super.viewWillAppear(true)
+        super.viewWillAppear(animated)
         print("view Will appear got called may be realod data is called first here")
+        //set the layout
+        let width = view.frame.width/3
+        let layout = collectionView.collectionViewLayout as! UICollectionViewFlowLayout
+        layout.itemSize = CGSize(width: width, height: width)
+        print(layout.itemSize)
+
     }
     
     override func viewWillDisappear(_ animated: Bool) {
@@ -124,15 +126,12 @@ class CollectionViewController: UIViewController{
         let width = size.width/3
         let layout = collectionView.collectionViewLayout as! UICollectionViewFlowLayout
         layout.itemSize = CGSize(width: width, height: width)
-        
     }
     
     @IBAction func newCollectionButtonTapped(_ sender: Any) {
         
         newCollectionButton.isEnabled = false
-        print("new collection got called \(newCollectionButton.titleLabel!.text!)")
         if newCollectionButton.titleLabel!.text! == "New Collection"{
-           
             let numberOfPhotos = preDataArray.count
             if 21 < numberOfPhotos{
                 placeHolderNumber = min(numberOfPhotos,42)
@@ -142,7 +141,6 @@ class CollectionViewController: UIViewController{
                     self.collectionView!.reloadData()
                 }
                 preDataArray = Array(preDataArray[21...numberOfPhotos-1])
-                
                 //we need a delay so that reloadData has time to display the activity indicators
                 performUIUpdatesOnMainWithDelay(.now() + 0.1){
                     self.arrayOfPhotos = self.constructArrayOfPhotos(Array(self.preDataArray[21...self.placeHolderNumber-1]), self.pin!)
