@@ -142,7 +142,7 @@ class CollectionViewController: UIViewController{
                 }
                 preDataArray = Array(preDataArray[21...numberOfPhotos-1])
                 //we need a delay so that reloadData has time to display the activity indicators
-                performUIUpdatesOnMainWithDelay(.now() + 0.1){
+                DispatchQueue.global().async {
                     self.arrayOfPhotos = self.constructArrayOfPhotos(Array(self.preDataArray[21...self.placeHolderNumber-1]), self.pin!)
                     self.dataIsDownloading = false
                     self.collectionView?.reloadData()
