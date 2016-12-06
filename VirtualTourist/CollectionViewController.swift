@@ -63,7 +63,6 @@ class CollectionViewController: UIViewController{
         collectionView.delegate = self
         collectionView.dataSource = self
         
-        
         //check if there is any pictures stored for this pin
         let fetchRequest = NSFetchRequest<NSFetchRequestResult>(entityName: "Photo")
         let predicate = NSPredicate(format: "photoToPin = %@", argumentArray: [pin!])
@@ -121,7 +120,7 @@ class CollectionViewController: UIViewController{
     
     override func viewWillTransition(to size: CGSize, with coordinator: UIViewControllerTransitionCoordinator) {
         super.viewWillTransition(to: size, with: coordinator)
-        //perform updates in main?
+        
         //set the layout
         let width = size.width/3
         let layout = collectionView.collectionViewLayout as! UICollectionViewFlowLayout
@@ -201,6 +200,12 @@ class CollectionViewController: UIViewController{
         }
     }
     
+    func saves(){
+        let appDelegate = UIApplication.shared.delegate as! AppDelegate
+        let stack = appDelegate.stack
+        stack?.saves()
+    }
+
     
     func closureForGetMethod(_ jsonData:[String: AnyObject], _ error: NSError?){
      
@@ -271,10 +276,8 @@ class CollectionViewController: UIViewController{
         for photo in arrayOfPhotos{
             context?.delete(photo)
         }
-        // set the context
-        let appDelegate = UIApplication.shared.delegate as! AppDelegate
-        let stack = appDelegate.stack
-        stack?.saves()
+        
+        saves()
         //we get out of a photoDictionary to return the urlString
         func getUrlString(_ photosDictionary:[String: AnyObject])->String?{
             guard let urlString = photosDictionary[Constants.FlickrResponseKeys.MediumURL] as? String else{
