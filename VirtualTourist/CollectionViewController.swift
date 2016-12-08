@@ -52,7 +52,6 @@ class CollectionViewController: UIViewController{
         let appDelegate = UIApplication.shared.delegate as! AppDelegate
         let stack = appDelegate.stack
         context = stack?.context
-        let persistentContext = stack?.persistingContext
         //we use the pin infromation send to us by the mapViewController to set the region of the mapView
         mapView.region.center = pin!.annotation.coordinate
         var nearSpan = MKCoordinateSpan()
@@ -146,9 +145,11 @@ class CollectionViewController: UIViewController{
                 DispatchQueue.global().async {
                     self.arrayOfPhotos = self.constructArrayOfPhotos(Array(self.preDataArray[21...self.placeHolderNumber-1]), self.pin!)
                     self.dataIsDownloading = false
-                    self.collectionView?.reloadData()
-                    self.newCollectionButton.isEnabled = true
-                    self.newCollectionView.alpha = 1
+                    performUIUpdatesOnMainWithDelay {
+                        self.collectionView?.reloadData()
+                        self.newCollectionButton.isEnabled = true
+                        self.newCollectionView.alpha = 1
+                    }
                 }
             }else{
                 arrayOfPhotos = [Photo]()
@@ -354,6 +355,7 @@ extension CollectionViewController: UICollectionViewDelegate, UICollectionViewDa
     }
     
     func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
+        
         let cell = collectionView.dequeueReusableCell(withReuseIdentifier: "Cell", for: indexPath) as!
         CollectionCell
         
