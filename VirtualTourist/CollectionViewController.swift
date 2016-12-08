@@ -74,7 +74,6 @@ class CollectionViewController: UIViewController{
             }catch{
                 fatalError("can not get the photos form core data")
             }
-
         }
         
         if (arrayOfPhotos.count) > 0{
@@ -134,24 +133,25 @@ class CollectionViewController: UIViewController{
         if newCollectionButton.titleLabel!.text! == "New Collection"{
             let numberOfPhotos = preDataArray.count
             if 21 < numberOfPhotos{
-                placeHolderNumber = min(numberOfPhotos,42)
+                placeHolderNumber = min(numberOfPhotos,42)//may be subtract -1 to the number of photos?
                 dataIsDownloading = true
-                print("data is danwlading \(self.dataIsDownloading)")
                 performUIUpdatesOnMainWithDelay {
                     self.collectionView!.reloadData()
                 }
-                preDataArray = Array(preDataArray[21...numberOfPhotos-1])
-                //we need a delay so that reloadData has time to display the activity indicators
+                //we need to dispach a new queue to run this on the background and not block the main queque
                 DispatchQueue.global().async {
                     self.arrayOfPhotos = self.constructArrayOfPhotos(Array(self.preDataArray[21...self.placeHolderNumber-1]), self.pin!)
                     self.dataIsDownloading = false
+                    self.preDataArray = Array(self.preDataArray[21...numberOfPhotos-1])
                     performUIUpdatesOnMainWithDelay {
                         self.collectionView?.reloadData()
                         self.newCollectionButton.isEnabled = true
                         self.newCollectionView.alpha = 1
                     }
                 }
+                
             }else{
+                dataIsDownloading = false
                 arrayOfPhotos = [Photo]()
                 collectionView!.reloadData()
             }
@@ -350,6 +350,7 @@ extension CollectionViewController: UICollectionViewDelegate, UICollectionViewDa
     
     func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
         let a = dataIsDownloading ? placeHolderNumber : arrayOfPhotos.count
+        print("dataIsDownloading \(dataIsDownloading),\(placeHolderNumber),\(arrayOfPhotos.count)")
         print("a=\(a)")
         return min(21, a)
     }
@@ -370,6 +371,7 @@ extension CollectionViewController: UICollectionViewDelegate, UICollectionViewDa
         }else{
            //if the data is no longer donwloading we place an image cell in the array
             performUIUpdatesOnMainWithDelay {
+                print("indexPath.row = \(indexPath.row)")
                 let photo = self.arrayOfPhotos[indexPath.row]
                 guard let image = UIImage(data: photo.imageData as! Data) else{
                     return
