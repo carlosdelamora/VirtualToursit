@@ -141,12 +141,12 @@ class MapViweController: UIViewController{
             annotation.coordinate = mapCoordinates
             annotations.append(annotation)
             mapView.addAnnotation(annotation)
-            print("pin droped in \(annotation.coordinate)")
             //create Pin to save it into core Data append it to the array pins
-            let pin = Pin(latitude: annotation.coordinate.latitude, longitude: annotation.coordinate.longitude, context: context!)
-            pins.append(pin)
+            context?.performAndWait {
+                let pin = Pin(latitude: annotation.coordinate.latitude, longitude: annotation.coordinate.longitude, context: self.context!)
+                    self.pins.append(pin)
+            }
             saves()
-            print("the new pin deropded has coordinates\(pin.annotation.coordinate) the pin has been saved to core data")
         }        
     }
 }

@@ -52,7 +52,7 @@ class CollectionViewController: UIViewController{
         let appDelegate = UIApplication.shared.delegate as! AppDelegate
         let stack = appDelegate.stack
         context = stack?.context
-        
+        let persistentContext = stack?.persistingContext
         //we use the pin infromation send to us by the mapViewController to set the region of the mapView
         mapView.region.center = pin!.annotation.coordinate
         var nearSpan = MKCoordinateSpan()
@@ -67,13 +67,15 @@ class CollectionViewController: UIViewController{
         let fetchRequest = NSFetchRequest<NSFetchRequestResult>(entityName: "Photo")
         let predicate = NSPredicate(format: "photoToPin = %@", argumentArray: [pin!])
         fetchRequest.predicate = predicate
-        
-        do{
-            if let results = try context?.fetch(fetchRequest) as? [Photo]{
-            arrayOfPhotos = results
+        context?.performAndWait {
+            do{
+                if let results = try self.context?.fetch(fetchRequest) as? [Photo]{
+                    self.arrayOfPhotos = results
+                }
+            }catch{
+                fatalError("can not get the photos form core data")
             }
-        }catch{
-            fatalError("can not get the photos form core data")
+
         }
         
         if (arrayOfPhotos.count) > 0{
@@ -274,9 +276,10 @@ class CollectionViewController: UIViewController{
         
         var photosArray = [Photo]()
         for photo in arrayOfPhotos{
-            context?.delete(photo)
+            context?.perform {
+                self.context?.delete(photo)
+            }
         }
-        
         saves()
         //we get out of a photoDictionary to return the urlString
         func getUrlString(_ photosDictionary:[String: AnyObject])->String?{
@@ -295,7 +298,9 @@ class CollectionViewController: UIViewController{
                     if viewWillDisapear{
                         return
                     }
-                    let _ = Photo( imageUrlString, imageData, aPin, context!)
+                    context?.perform{
+                    let _ = Photo( imageUrlString, imageData, aPin, self.context!)
+                    }
                 }
             }
         }
@@ -306,12 +311,15 @@ class CollectionViewController: UIViewController{
         let predicate = NSPredicate(format: "photoToPin = %@", argumentArray: [pin])
         fetchRequest.predicate = predicate
         print("we fetch the request")
-        do{
-            if let results = try context?.fetch(fetchRequest) as? [Photo]{
-                photosArray = results
+        context?.performAndWait {
+            
+            do{
+                if let results = try self.context?.fetch(fetchRequest) as? [Photo]{
+                    photosArray = results
+                }
+            }catch{
+                fatalError("can not get the photos form core data")
             }
-        }catch{
-            fatalError("can not get the photos form core data")
         }
         print("consturct array of photos is about to end")
         return photosArray
